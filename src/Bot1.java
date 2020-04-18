@@ -22,8 +22,10 @@ public class Bot1 implements BotAPI {
         this.dictionary = dictionary;
     }
 
+
+
     public String getCommand() {
-        // Add your code here to input your commands
+        //Add your code here to input your commands
         String command = "";
         switch (turnCount) {
             case 0:
@@ -48,5 +50,4 @@ public class Bot1 implements BotAPI {
         turnCount++;
         return command;
     }
-
 }
