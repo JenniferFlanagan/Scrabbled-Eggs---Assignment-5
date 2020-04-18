@@ -31,6 +31,41 @@ public class Bot0 implements BotAPI {
     //6. Place word.
     //7. If word cannot be placed, pass
 
+
+    public String PlaceFirstWord() {
+
+
+        String word = "";
+        if (board.isFirstPlay())
+        {
+
+            //Put tiles from frame into a word  :(
+
+           word = frameToString();
+
+
+
+        }
+
+
+
+
+        String command = "";
+        if (word != "")
+        {
+            command += "H8 ";
+            command += "A ";
+            command += word;
+        }
+        System.out.println(command);
+
+        return command;
+    }
+
+
+
+
+
     //Functions
     //1. Place Best Word
     public String getCommand() {
@@ -39,7 +74,7 @@ public class Bot0 implements BotAPI {
         String command = "";
         switch (turnCount) {
             case 0:
-                command = "NAME Bot0";
+                command = PlaceFirstWord();//"NAME Bot0"; //why do i suck lol
                 break;
             case 1:
                 command = "PASS";
@@ -131,6 +166,7 @@ public class Bot0 implements BotAPI {
         return coordinates;
     }
 
+
     public boolean isPlaceable(int i, int j)
     {
         if(     !board.getSquareCopy(i+1, j).isOccupied()    ||
@@ -141,31 +177,42 @@ public class Bot0 implements BotAPI {
         else return false;
     }
 
-    public String placeFirstWord()
-    {
-        return "";
-    }
+
 
     public String makeBestMove()
     {
         String command = "";
-        command = placeFirstWord();
+        command = PlaceFirstWord();
 
 
         if(command == "")
             command = checkValuableSquare();
         else return command;
-
+/*
         if(command == "")
             command = placeValTile();
         else
         {
 
         }
-
+*/
         return command;
     }
 
-
+    public String frameToString()
+    {
+        String user_frame = me.getFrameAsString();
+        String frameToString = "";
+        for(int i =0; i<user_frame.length(); i++)
+        {
+            if(user_frame.charAt(i) != '[' &&
+                    user_frame.charAt(i) != ']' &&
+                    user_frame.charAt(i) != ' ' &&
+                    user_frame.charAt(i) != ']' &&
+                    user_frame.charAt(i) != ',')
+                    frameToString += user_frame.charAt(i);
+        }
+        return frameToString;
+    }
 
 }
