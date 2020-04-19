@@ -16,8 +16,8 @@ public class Bot0 implements BotAPI {
     private DictionaryAPI dictionary;
     private int turnCount;
 
-    private ArrayList<Integer> word_score = new ArrayList<>();
-    private ArrayList<String> words = new ArrayList<>();
+    private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
+    private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
 
     Bot0(PlayerAPI me, OpponentAPI opponent, BoardAPI board, UserInterfaceAPI ui, DictionaryAPI dictionary) {
         this.me = me;
@@ -39,16 +39,14 @@ public class Bot0 implements BotAPI {
 
     public String PlaceFirstWord() {
         String word = "";
-        if (board.isFirstPlay())
-        {
+        if (board.isFirstPlay()) {
             //Put tiles from frame into a word  :(
-           word = frameToString();
+            word = frameToString();
 
         }
 
         String command = "";
-        if (word != "")
-        {
+        if (word != "") {
             command += "H8 ";
             command += "A ";
             command += word;
@@ -95,17 +93,13 @@ public class Bot0 implements BotAPI {
     }
 
     /* Checks if there are any empty valuable squares and returns the coordinates if found */
-    public String checkValuableSquare()
-    {
+    public String checkValuableSquare() {
         String coordinates = "";
 
         //Check for empty triple word scores
-        for(int i=0; i<15; i++)
-        {
-            for(int j = 0; j<15; j++)
-            {
-                if(board.getSquareCopy(i,j).isTripleWord() && !board.getSquareCopy(i,j).isOccupied())
-                {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isTripleWord() && !board.getSquareCopy(i, j).isOccupied()) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -115,12 +109,9 @@ public class Bot0 implements BotAPI {
         }
 
         //Check for empty double word scores
-        for(int i=0; i<15; i++)
-        {
-            for(int j = 0; j<15; j++)
-            {
-                if(board.getSquareCopy(i,j).isDoubleWord() && !board.getSquareCopy(i,j).isOccupied())
-                {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isDoubleWord() && !board.getSquareCopy(i, j).isOccupied()) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -130,12 +121,9 @@ public class Bot0 implements BotAPI {
         }
 
         //Check for empty triple letter scores
-        for(int i=0; i<15; i++)
-        {
-            for(int j = 0; j<15; j++)
-            {
-                if(board.getSquareCopy(i,j).isTripleLetter() && !board.getSquareCopy(i,j).isOccupied())
-                {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isTripleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -146,12 +134,9 @@ public class Bot0 implements BotAPI {
 
 
         //Check for double letter scores
-        for(int i=0; i<15; i++)
-        {
-            for(int j = 0; j<15; j++)
-            {
-                if(board.getSquareCopy(i,j).isDoubleLetter() && !board.getSquareCopy(i,j).isOccupied())
-                {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isDoubleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -165,30 +150,27 @@ public class Bot0 implements BotAPI {
     }
 
 
-    public boolean isPlaceable(int i, int j)
-    {
-        if(     !board.getSquareCopy(i+1, j).isOccupied()    ||
-                !board.getSquareCopy(i-1, j).isOccupied()    ||
-                !board.getSquareCopy(i, j+1).isOccupied()    ||
+    public boolean isPlaceable(int i, int j) {
+        if (!board.getSquareCopy(i + 1, j).isOccupied() ||
+                !board.getSquareCopy(i - 1, j).isOccupied() ||
+                !board.getSquareCopy(i, j + 1).isOccupied() ||
                 !board.getSquareCopy(i, j).isOccupied()
         ) return true;
         else return false;
     }
 
-    public boolean isConnectingHorizontal(int i, int j)
-    {
-        if(     board.getSquareCopy(i+1, j).isOccupied()    ||
-                board.getSquareCopy(i-1, j).isOccupied()    ||
-                board.getSquareCopy(i, j+1).isOccupied()
+    public boolean isConnectingHorizontal(int i, int j) {
+        if (board.getSquareCopy(i + 1, j).isOccupied() ||
+                board.getSquareCopy(i - 1, j).isOccupied() ||
+                board.getSquareCopy(i, j + 1).isOccupied()
         ) return true;
         else return false;
     }
 
-    public boolean isConnectingVertical(int i, int j)
-    {
-        if(     board.getSquareCopy(i+1, j).isOccupied()    ||
-                board.getSquareCopy(i, j-1).isOccupied()    ||
-                board.getSquareCopy(i, j+1).isOccupied()
+    public boolean isConnectingVertical(int i, int j) {
+        if (board.getSquareCopy(i + 1, j).isOccupied() ||
+                board.getSquareCopy(i, j - 1).isOccupied() ||
+                board.getSquareCopy(i, j + 1).isOccupied()
         ) return true;
         else return false;
     }
@@ -199,7 +181,7 @@ public class Bot0 implements BotAPI {
         boolean isHorizontal = false; //Matching boolean variable from the word placement function
         Random rand = new Random();
         int direction = rand.nextInt(2);
-        if(direction-1 == 1)
+        if (direction - 1 == 1)
             return isHorizontal;
         else return !isHorizontal;
     }
@@ -301,137 +283,45 @@ public class Bot0 implements BotAPI {
      */
 
 
-    private String getHighestWord(int row, int col)
-    {
-        char highValSquare = board.getSquareCopy(row,col).getTile().getLetter(); // The high value tile from board
+    private String getHighestWord(int row, int col) {
+        char highValSquare = board.getSquareCopy(row, col).getTile().getLetter(); // The high value tile from board
 
         String possibleWord = highValSquare + frameToString(); //String for frame + tile from board
 
-        //Store all permutations of string in words arraylist
-        words = getPermutation("abc","", words);
+        words = getPermutation("abc", "", words); //Store all permutations of string in words arraylist
 
+        populateWordScore(); //Populate word score array with corresponding word values
 
-        //Populate word_score array with corresponding scores
-        for(int i =0; i< words.size(); i++)
-        {
-            String curr = words.get(i);
-            int score = 0;
-            for(int j =0; j<curr.length(); j++)
-            {
-                Tile getValue = new Tile(curr.charAt(j));
-                score += getValue.getValue();
-            }
-            word_score.add(score);
-            score = 0;
-        }
-
-
-        String highestWord = getHighWordScore();
-
-        //Try to place the highest word - if not go to the second highest word
+        String highestWord = getHighWordScore(); //Get current highest word
 
         boolean validWordFlag = false;
-        while(!validWordFlag)
-        {
-            if(isValidMove(highestWord,row,col) != "")
+        while (!validWordFlag) { //Try to place the highest word - if not go to the next highest
+            if (isValidMove(highestWord, row, col) != "")
                 break;
             else highestWord = getHighWordScore();
         }
 
 
-        //Find highest score then check if it is a legal move
-
         return "";
     }
 
-    private String getHighestWord()
-    {
-        String possibleWord = frameToString();
-        ArrayList<String> words = new ArrayList<>();
 
-        //Get all valid possible words
-        System.out.println(words.toString());
-
-        ArrayList<Integer> word_score = new ArrayList<>();
-        for(int i=0; i< words.size(); i++) //Populate word_score array with corresponding scores
-        {
-            String curr = words.get(i);
-            int score = 0;
-            for(int j =0; j<curr.length(); j++)
-            {
-                Tile getValue = new Tile(curr.charAt(j));
-                score += getValue.getValue();
-            }
-            word_score.add(score);
-            score = 0;
-        }
-
-        //Find highest scoring word
-        int maxScore = 0;
-        int tempIndex = 0;
-
-        for(int i =0; i< word_score.size(); i++)
-        {
-            if(i == 0) maxScore = word_score.get(i);
-            else
-            {
-                if(maxScore < word_score.get(i))
-                {
-                    tempIndex = i;
-                    maxScore = word_score.get(i);
-                }
-            }
-        }
-
-        System.out.println(word_score.toString());
-        //Find highest score then check if it is a legal move
-
-        return "";
-    }
-
-    public String makeBestMove()
-    {
-        String command = "";
-        command = PlaceFirstWord();
-
-        if (isChallenge()){
-            return "CHALLENGE";
-        }
-
-
-        if(command == "")
-            command = checkValuableSquare();
-        else return command;
-
-        if(command == "")
-           command = placeValTile();
-        else
-        {
-
-        }
-
-        return command;
-    }
-
-    public String frameToString()
-    {
+    public String frameToString() {
         String user_frame = me.getFrameAsString();
         String frameToString = "";
-        for(int i =0; i<user_frame.length(); i++)
-        {
-            if(user_frame.charAt(i) != '[' &&
+        for (int i = 0; i < user_frame.length(); i++) {
+            if (user_frame.charAt(i) != '[' &&
                     user_frame.charAt(i) != ']' &&
                     user_frame.charAt(i) != ' ' &&
                     user_frame.charAt(i) != ']' &&
                     user_frame.charAt(i) != ',')
-                    frameToString += user_frame.charAt(i);
+                frameToString += user_frame.charAt(i);
         }
         return frameToString.toUpperCase();
     }
 
 
-    private ArrayList<String> getPermutation(String str, String ans, ArrayList<String> words)
-    {
+    private ArrayList<String> getPermutation(String str, String ans, ArrayList<String> words) {
 
         // If string is empty
         if (str.length() == 0) {
@@ -439,7 +329,7 @@ public class Bot0 implements BotAPI {
             //only add valid words
             ArrayList<Word> wordList = new ArrayList<>();
             wordList.add(stringToWord(ans));
-            if(dictionary.areWords(wordList))
+            if (dictionary.areWords(wordList))
                 words.add(ans);
 
             return words;
@@ -460,21 +350,18 @@ public class Bot0 implements BotAPI {
     }
 
 
-
-    private Word stringToWord(String str)
-    {
-        return new Word(0,0,true, str);
+    private Word stringToWord(String str) {
+        return new Word(0, 0, true, str);
     }
 
-    public String placeValTile()
-    {
+    public String placeValTile() {
 
-        String coordinates ="";
+        String coordinates = "";
 
         //check for tiles with value 10
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 10){
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).getTile().getValue() == 10) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -484,9 +371,9 @@ public class Bot0 implements BotAPI {
         }
 
         //check for tiles with value 8
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 8){
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).getTile().getValue() == 8) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -496,9 +383,9 @@ public class Bot0 implements BotAPI {
         }
 
         //check for tiles with value 5
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 5){
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).getTile().getValue() == 5) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -508,9 +395,9 @@ public class Bot0 implements BotAPI {
         }
 
         //check for tiles with value 4
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 4){
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).getTile().getValue() == 4) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -520,9 +407,9 @@ public class Bot0 implements BotAPI {
         }
 
         //check for tiles with value 3
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 3){
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).getTile().getValue() == 3) {
                     coordinates += i;
                     coordinates += " ";
                     coordinates += j;
@@ -533,52 +420,43 @@ public class Bot0 implements BotAPI {
         return coordinates;
     }
 
-    private String isValidMove(String word, int col, int row)
-    {
+    private String isValidMove(String word, int col, int row) {
         //Find index of string where the tile from the board is located in the word
-        char valTile = board.getSquareCopy(row,col).getTile().getLetter();
+        char valTile = board.getSquareCopy(row, col).getTile().getLetter();
 
-        int index=0;
-        for(int i =0; i<word.length(); i++)
-        {
-            if(word.charAt(i) == valTile)
+        int index = 0;
+        for (int i = 0; i < word.length(); i++) {
+            if (word.charAt(i) == valTile)
                 index = i;
         }
 
         //Convert String word to Word object
-        Word wordObj = new Word(row,col,true,word);
+        Word wordObj = new Word(row, col, true, word);
         Frame frameObj = new Frame();
         ArrayList<Tile> tileArray = new ArrayList<>();
-        for(int i=0; i< word.length(); i++)
+        for (int i = 0; i < word.length(); i++)
             tileArray.add(new Tile(word.charAt(i)));
 
         frameObj.addTiles(tileArray);
 
-        if(board.isLegalPlay(frameObj,wordObj))
-        {
+        if (board.isLegalPlay(frameObj, wordObj)) {
             return col + " " + row + " " + wordObj.getLetters();
-        }
-        else
+        } else
 
 
-        return "";
+            return "";
     }
 
 
-
-    private String getHighWordScore()
-    {
+    private String getHighWordScore() {
         //Find highest scoring word
         int maxScore = 0;
         int tempIndex = 0;
 
-        for(int i =0; i< word_score.size(); i++)
-        {
-            if(i == 0) maxScore = word_score.get(i);
-            else
-            {
-                if(maxScore < word_score.get(i))
-                {
+        for (int i = 0; i < word_score.size(); i++) {
+            if (i == 0) maxScore = word_score.get(i);
+            else {
+                if (maxScore < word_score.get(i)) {
                     tempIndex = i;
                     maxScore = word_score.get(i);
                 }
@@ -589,8 +467,23 @@ public class Bot0 implements BotAPI {
 
         words.remove(tempIndex); //Remove word from array in case it cannot be placed
         return tempWord;
-
     }
+
+    public void populateWordScore()
+    {
+        //Populate word_score array with corresponding scores
+        for (int i = 0; i < words.size(); i++) {
+            String curr = words.get(i);
+            int score = 0;
+            for (int j = 0; j < curr.length(); j++) {
+                Tile getValue = new Tile(curr.charAt(j));
+                score += getValue.getValue();
+            }
+            word_score.add(score);
+            score = 0;
+        }
+    }
+
     private boolean isChallenge(){
         if (turnCount % 4 == 0) {
             return true;
