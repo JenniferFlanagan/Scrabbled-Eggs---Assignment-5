@@ -1,3 +1,4 @@
+
 public class Bot0 implements BotAPI {
 
     // The public API of Bot must not change
@@ -30,6 +31,41 @@ public class Bot0 implements BotAPI {
     //6. Place word.
     //7. If word cannot be placed, pass
 
+
+    public String PlaceFirstWord() {
+
+
+        String word = "";
+        if (board.isFirstPlay())
+        {
+
+            //Put tiles from frame into a word  :(
+
+           word = frameToString();
+
+
+
+        }
+
+
+
+
+        String command = "";
+        if (word != "")
+        {
+            command += "H8 ";
+            command += "A ";
+            command += word;
+        }
+        System.out.println(command);
+
+        return command;
+    }
+
+
+
+
+
     //Functions
     //1. Place Best Word
     public String getCommand() {
@@ -38,7 +74,7 @@ public class Bot0 implements BotAPI {
         String command = "";
         switch (turnCount) {
             case 0:
-                command = "NAME Bot0";
+                command = PlaceFirstWord();//"NAME Bot0"; //why do i suck lol
                 break;
             case 1:
                 command = "PASS";
@@ -50,7 +86,7 @@ public class Bot0 implements BotAPI {
                 command = "SCORE";
                 break;
             case 4:
-                command = "CHALLENGE";
+                command = "POOL";
                 break;
             default:
                 command = "H8 A AN";
@@ -130,6 +166,7 @@ public class Bot0 implements BotAPI {
         return coordinates;
     }
 
+
     public boolean isPlaceable(int i, int j)
     {
         if(     !board.getSquareCopy(i+1, j).isOccupied()    ||
@@ -140,106 +177,42 @@ public class Bot0 implements BotAPI {
         else return false;
     }
 
-    public String placeFirstWord()
-    {
-        return "";
-    }
+
 
     public String makeBestMove()
     {
         String command = "";
-        command = placeFirstWord();
+        command = PlaceFirstWord();
 
-        if (isChallenge()){
-            return "CHALLENGE";
-        }
 
         if(command == "")
             command = checkValuableSquare();
         else return command;
-
+/*
         if(command == "")
             command = placeValTile();
         else
         {
 
         }
-
+*/
         return command;
     }
 
-    public String placeValTile(){
-
-        String coordinates ="";
-
-        //check for tiles with value 10
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 10){
-                        coordinates += i;
-                        coordinates += " ";
-                        coordinates += j;
-                        return coordinates;
-                }
-            }
+    public String frameToString()
+    {
+        String user_frame = me.getFrameAsString();
+        String frameToString = "";
+        for(int i =0; i<user_frame.length(); i++)
+        {
+            if(user_frame.charAt(i) != '[' &&
+                    user_frame.charAt(i) != ']' &&
+                    user_frame.charAt(i) != ' ' &&
+                    user_frame.charAt(i) != ']' &&
+                    user_frame.charAt(i) != ',')
+                    frameToString += user_frame.charAt(i);
         }
-
-        //check for tiles with value 8
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 8){
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //check for tiles with value 5
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 5){
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //check for tiles with value 4
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 4){
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //check for tiles with value 3
-        for (int i = 0; i < 15; i++){
-            for(int j = 0; j < 15; j++){
-                if (board.getSquareCopy(i,j).getTile().getValue() == 3){
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-        return coordinates;
-    }
-
-
-    private boolean isChallenge(){
-        if (turnCount % 4 == 0) {
-            return true;
-        }
-        return false;
+        return frameToString;
     }
 
 }
