@@ -38,18 +38,48 @@ public class Bot0 implements BotAPI {
 
 
     public String PlaceFirstWord() {
-        String word = "";
-        if (board.isFirstPlay()) {
-            //Put tiles from frame into a word  :(
-            word = frameToString();
 
+
+
+        String frame = "";
+        if (board.isFirstPlay()) {
+            //Put tiles from frame into a word
+            frame = frameToString();
+            frame = frame.substring(3);
         }
 
+        int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
+
+        if(numBlanks > 0) //Remove blank tiles
+            frame = frame.replaceAll("_", "A");
+
+
+        words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
+        while(words.size() == 0)
+        {
+            words = getPermutation(removeLowestLetter(frame), "", words);
+        }
+        String word = getHighWordScore();
+
+        if(numBlanks > 0) //Add the blanks back
+        {
+            word.replaceAll("A","_");
+        }
         String command = "";
-        if (word != "") {
+        if (frame != "") {
             command += "H8 ";
             command += "A ";
-            command += word;
+            command += word + " ";
+
+
+            for (int i = 0; i < word.length(); i++) {
+                if (word.charAt(i) == Tile.BLANK) {
+                    command += "A";
+                } else {
+                    continue;
+                }
+            }
+
         }
         System.out.println(command);
 
@@ -88,7 +118,7 @@ public class Bot0 implements BotAPI {
 
          */
         //getHighestWord();
-
+        command = PlaceFirstWord();
         return command;
     }
 
@@ -290,7 +320,7 @@ public class Bot0 implements BotAPI {
 
         words = getPermutation("abc", "", words); //Store all permutations of string in words arraylist
 
-        populateWordScore(); //Populate word score array with corresponding word values
+        //populateWordScore(); //Populate word score array with corresponding word values
 
         String highestWord = getHighWordScore(); //Get current highest word
 
@@ -346,6 +376,7 @@ public class Bot0 implements BotAPI {
 
             getPermutation(ros, ans + ch, words);
         }
+        populateWordScore();
         return words;
     }
 
@@ -448,8 +479,9 @@ public class Bot0 implements BotAPI {
     }
 
 
-    private String getHighWordScore() {
-        //Find highest scoring word
+    private String getHighWordScore() //Returns highest scoring word
+    {
+
         int maxScore = 0;
         int tempIndex = 0;
 
@@ -491,4 +523,52 @@ public class Bot0 implements BotAPI {
         return false;
     }
 
+
+    private int getNumBlanks(String word)
+    {
+        int count = 0;
+        for(int i=0; i<word.length(); i++)
+        {
+            if(word.charAt(i) == '_')
+                count++;
+        }
+        return count;
+    }
+
+
+//    private ArrayList<String> getValidPermuations()
+//    {
+//
+//    }
+
+    private String removeLowestLetter(String word)
+    {
+        if(word.length() == 0)
+        {
+            System.out.println("im sad :(I");
+        }
+        int min = 11;
+        int minIndex = 0;
+        String minChar = "";
+        for(int i = 0; i < word.length(); i++) // Remove min character
+        {
+            Tile getVal = new Tile(word.charAt(i));
+            if(min > getVal.getValue() ) {
+                min = getVal.getValue();
+                minChar = String.valueOf(word.charAt(i));
+                minIndex = i;
+            }
+        }
+        String newWord = "";
+        for(int i = 0; i < word.length(); i++)
+        {
+            if(minChar != "")
+            {
+                if(word.charAt(i) !=  minChar.charAt(0))
+                    newWord += word.charAt(i);
+            }
+
+        }
+        return newWord;
+    }
 }
