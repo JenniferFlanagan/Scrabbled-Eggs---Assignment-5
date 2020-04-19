@@ -184,18 +184,22 @@ public class Bot0 implements BotAPI {
         String command = "";
         command = PlaceFirstWord();
 
+        if (isChallenge()){
+            return "CHALLENGE";
+        }
+
 
         if(command == "")
             command = checkValuableSquare();
         else return command;
-/*
+
         if(command == "")
             command = placeValTile();
         else
         {
 
         }
-*/
+
         return command;
     }
 
@@ -213,6 +217,80 @@ public class Bot0 implements BotAPI {
                     frameToString += user_frame.charAt(i);
         }
         return frameToString;
+    }
+
+    public String placeValTile(){
+
+        String coordinates ="";
+
+        //check for tiles with value 10
+        for (int i = 0; i < 15; i++){
+            for(int j = 0; j < 15; j++){
+                if (board.getSquareCopy(i,j).getTile().getValue() == 10){
+                    coordinates += i;
+                    coordinates += " ";
+                    coordinates += j;
+                    return coordinates;
+                }
+            }
+        }
+
+        //check for tiles with value 8
+        for (int i = 0; i < 15; i++){
+            for(int j = 0; j < 15; j++){
+                if (board.getSquareCopy(i,j).getTile().getValue() == 8){
+                    coordinates += i;
+                    coordinates += " ";
+                    coordinates += j;
+                    return coordinates;
+                }
+            }
+        }
+
+        //check for tiles with value 5
+        for (int i = 0; i < 15; i++){
+            for(int j = 0; j < 15; j++){
+                if (board.getSquareCopy(i,j).getTile().getValue() == 5){
+                    coordinates += i;
+                    coordinates += " ";
+                    coordinates += j;
+                    return coordinates;
+                }
+            }
+        }
+
+        //check for tiles with value 4
+        for (int i = 0; i < 15; i++){
+            for(int j = 0; j < 15; j++){
+                if (board.getSquareCopy(i,j).getTile().getValue() == 4){
+                    coordinates += i;
+                    coordinates += " ";
+                    coordinates += j;
+                    return coordinates;
+                }
+            }
+        }
+
+        //check for tiles with value 3
+        for (int i = 0; i < 15; i++){
+            for(int j = 0; j < 15; j++){
+                if (board.getSquareCopy(i,j).getTile().getValue() == 3){
+                    coordinates += i;
+                    coordinates += " ";
+                    coordinates += j;
+                    return coordinates;
+                }
+            }
+        }
+        return coordinates;
+    }
+
+
+    private boolean isChallenge(){
+        if (turnCount % 4 == 0) {
+            return true;
+        }
+        return false;
     }
 
 }
