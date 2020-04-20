@@ -19,6 +19,8 @@ public class Bot0 implements BotAPI {
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
 
+    private boolean exchangeFlag = false;
+
     Bot0(PlayerAPI me, OpponentAPI opponent, BoardAPI board, UserInterfaceAPI ui, DictionaryAPI dictionary) {
         this.me = me;
         this.opponent = opponent;
@@ -38,57 +40,63 @@ public class Bot0 implements BotAPI {
 
 
     public String PlaceFirstWord() {
-        System.out.println(frameToString());
-        String frame = "";
-        if (board.isFirstPlay()) {
-            //Put tiles from frame into a word
-            frame = frameToString();
-            //frame = frame.substring(1);
-        }
-
-        int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
-
-        if(numBlanks > 0) //Remove blank tiles
-            frame = frame.replaceAll("_", "A");
-
-
-        words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
-
-        String temp = frame;
-        while(words.size() == 0)
-        {
-
-            frame = removeLowestLetter(frame);
-            words = getPermutation(frame, "", words);
-        }
-
-
-        String word = getHighWordScore();
-
-        if(numBlanks > 0) //Add the blanks back
-        {
-            word.replaceAll("A","_");
-        }
-        String command = "";
-        if (frame != "") {
-            command += "H8 ";
-            command += "A ";
-            command += word + " ";
-
-
-            for (int i = 0; i < word.length(); i++) {
-                if (word.charAt(i) == Tile.BLANK) {
-                    command += "A";
-                } else {
-                    continue;
-                }
+            System.out.println(frameToString());
+            String frame = "";
+            if (board.isFirstPlay()) {
+                //Put tiles from frame into a word
+                frame = frameToString();
+                //frame = frame.substring(1);
             }
 
-        }
-        System.out.println(command);
+            int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
 
-        return command;
+            if(numBlanks > 0) //Remove blank tiles
+                frame = frame.replaceAll("_", "A");
+
+
+            words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
+
+            String temp = frame;
+            int counter = 0; //Counter for removing a letter from the perumation string if no valid words can be found
+            while(words.size() == 0 && !exchangeFlag)
+            {
+                frame = removeLowestLetter(frame);
+                words = getPermutation(frame, "", words);
+            }
+
+            if(exchangeFlag)
+            {
+                return "";
+            }
+
+
+            String word = getHighWordScore();
+
+            if(numBlanks > 0) //Add the blanks back
+            {
+                word.replaceAll("A","_");
+            }
+            String command = "";
+            if (frame != "") {
+                command += "H8 ";
+                command += "A ";
+                command += word + " ";
+
+
+                for (int i = 0; i < word.length(); i++) {
+                    if (word.charAt(i) == Tile.BLANK) {
+                        command += "A";
+                    } else {
+                        continue;
+                    }
+                }
+
+            }
+            System.out.println(command);
+
+            return command;
     }
+
 
 
     //Functions
@@ -126,7 +134,30 @@ public class Bot0 implements BotAPI {
         command = PlaceFirstWord();
         return command;
     }
+    public String makeBestMove()
+    {
+        String command = "";
+        command = PlaceFirstWord();
 
+        // command == "" and && exchangeFlag == true
+        //then exchange
+        //command = EXCHANGE letters
+        //return command
+
+        if(command == "")
+            command = checkValuableSquare();
+        else return command;
+
+        if(command == "")
+            return command;
+            // command = placeValTile();
+        else
+        {
+
+        }
+
+        return command;
+    }
     /* Checks if there are any empty valuable squares and returns the coordinates if found */
     public String checkValuableSquare() {
         String coordinates = "";
@@ -356,30 +387,26 @@ public class Bot0 implements BotAPI {
     }
 
 
-    private ArrayList<String> getPermutation(String str, String ans, ArrayList<String> words) {
+    private ArrayList<String> getPermutation(String word, String perm, ArrayList<String> words) {
 
         // If string is empty
-        if (str.length() == 0) {
+        if (word.length() == 0) {
 
             //only add valid words
             ArrayList<Word> wordList = new ArrayList<>();
-            wordList.add(stringToWord(ans));
+            wordList.add(stringToWord(perm));
             if (dictionary.areWords(wordList))
-                words.add(ans);
+                words.add(perm);
 
             return words;
         }
 
-        for (int i = 0; i < str.length(); i++) {
-            // ith character of str
-            char ch = str.charAt(i);
+        for (int i = 0; i < word.length(); i++) {
+            char ch = word.charAt(i);
+            String ros = word.substring(0, i) +
+                    word.substring(i + 1);
 
-            // Rest of the string after excluding
-            // the ith character
-            String ros = str.substring(0, i) +
-                    str.substring(i + 1);
-
-            getPermutation(ros, ans + ch, words);
+            getPermutation(ros, perm + ch, words);
         }
         populateWordScore();
         return words;
@@ -550,7 +577,7 @@ public class Bot0 implements BotAPI {
     {
         if(word.length() == 0)
         {
-            System.out.println("im sad :(I");
+            exchangeFlag = true;
         }
         int min = 11;
         int minIndex = 0;
@@ -576,4 +603,6 @@ public class Bot0 implements BotAPI {
         }
         return newWord;
     }
+
+
 }
