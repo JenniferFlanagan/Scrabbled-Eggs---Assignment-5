@@ -38,14 +38,12 @@ public class Bot0 implements BotAPI {
 
 
     public String PlaceFirstWord() {
-
-
-
+        System.out.println(frameToString());
         String frame = "";
         if (board.isFirstPlay()) {
             //Put tiles from frame into a word
             frame = frameToString();
-            frame = frame.substring(3);
+            //frame = frame.substring(1);
         }
 
         int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
@@ -55,10 +53,16 @@ public class Bot0 implements BotAPI {
 
 
         words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
+
+        String temp = frame;
         while(words.size() == 0)
         {
-            words = getPermutation(removeLowestLetter(frame), "", words);
+
+            frame = removeLowestLetter(frame);
+            words = getPermutation(frame, "", words);
         }
+
+
         String word = getHighWordScore();
 
         if(numBlanks > 0) //Add the blanks back
@@ -94,9 +98,10 @@ public class Bot0 implements BotAPI {
         // Your code must give the command NAME <botname> at the start of the game
         String command = "";
 
-        /*switch (turnCount) {
+        switch (turnCount) {
             case 0:
-                command = PlaceFirstWord();//"NAME Bot0"; //why do i suck lol
+               // command = PlaceFirstWord();//"NAME Bot0";
+                command = "PASS";
                 break;
             case 1:
                 command = "PASS";
@@ -116,7 +121,7 @@ public class Bot0 implements BotAPI {
         }
         turnCount++;
 
-         */
+
         //getHighestWord();
         command = PlaceFirstWord();
         return command;
