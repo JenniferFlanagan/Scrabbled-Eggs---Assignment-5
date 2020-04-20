@@ -139,6 +139,10 @@ public class Bot0 implements BotAPI {
         String command = "";
         command = PlaceFirstWord();
 
+        if (command == "" && exchangeFlag == true){
+            command = exchange();
+        }else return command;
+
         // command == "" and && exchangeFlag == true
         //then exchange
         //command = EXCHANGE letters
@@ -158,6 +162,22 @@ public class Bot0 implements BotAPI {
 
         return command;
     }
+
+    private String exchange() {
+
+        String letters = "";
+        String stringRack = frameToString();
+
+        int tilesToExchange = Math.round(((float)Math.random()*3)+2); //takes random tiles from 1-5
+
+        for (int i = 0; i < tilesToExchange; i++){
+            letters += stringRack.charAt(i); //put the characters into letters
+        }
+
+        return "EXCHANGE " + letters;
+
+    }
+
     /* Checks if there are any empty valuable squares and returns the coordinates if found */
     public String checkValuableSquare() {
         String coordinates = "";
