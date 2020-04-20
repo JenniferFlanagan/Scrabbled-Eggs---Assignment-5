@@ -16,6 +16,7 @@ public class Bot0 implements BotAPI {
     private DictionaryAPI dictionary;
     private int turnCount;
     private boolean firstMove = true;
+    private boolean firstWord = true;
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
@@ -69,6 +70,10 @@ public class Bot0 implements BotAPI {
 
         //Get coordinates (row and column) and store in integers
         String coordinates = placeValTile();
+        if(coordinates == "")
+        {
+            return "";
+        }
         String[] coordsArr = coordinates.split(" ");
         String colStr = coordsArr[1];
         String rowStr = coordsArr[0];
@@ -77,7 +82,7 @@ public class Bot0 implements BotAPI {
 
 
         //Combine the frame and the high val tile to a string and find permutations
-        String valTile = String.valueOf(board.getSquareCopy(row,col).getTile().getLetter());
+        String valTile = String.valueOf(board.getSquareCopy(row-1,col-1).getTile().getLetter());
         String frame = frameToString();
 
         String word = frame + valTile;
@@ -178,6 +183,10 @@ public class Bot0 implements BotAPI {
         String command = "";
         command = PlaceFirstWord();
 
+        if(firstWord && command == "")
+            firstMove = true;
+        else firstWord = false;
+
 
         if(command == "")
             command = placeWordValTile();
@@ -185,6 +194,7 @@ public class Bot0 implements BotAPI {
 
         if (command == "" && exchangeFlag == true){
             command = exchange();
+
         }else return command;
 
 
@@ -211,6 +221,7 @@ public class Bot0 implements BotAPI {
         for (int i = 0; i < tilesToExchange; i++){
             letters += stringRack.charAt(i); //put the characters into letters
         }
+        exchangeFlag = false;
 
         return "EXCHANGE " + letters;
 
@@ -482,10 +493,11 @@ public class Bot0 implements BotAPI {
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
+                if(board.getSquareCopy(i,j).isOccupied())
                 if (board.getSquareCopy(i, j).getTile().getValue() == 10) {
-                    coordinates += i;
+                    coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j;
+                    coordinates += j+1; //je suis fini
                     return coordinates;
                 }
             }
@@ -494,10 +506,11 @@ public class Bot0 implements BotAPI {
         //check for tiles with value 8
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).getTile().getValue() == 8) {
-                    coordinates += i;
+                if(board.getSquareCopy(i,j).isOccupied())
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 8) {
+                    coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j;
+                    coordinates += j+1;
                     return coordinates;
                 }
             }
@@ -506,10 +519,12 @@ public class Bot0 implements BotAPI {
         //check for tiles with value 5
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).getTile().getValue() == 5) {
-                    coordinates += i;
+                if(board.getSquareCopy(i,j).isOccupied())
+
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 5) {
+                    coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j;
+                    coordinates += j+1;
                     return coordinates;
                 }
             }
@@ -518,10 +533,12 @@ public class Bot0 implements BotAPI {
         //check for tiles with value 4
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).getTile().getValue() == 4) {
-                    coordinates += i;
+                if(board.getSquareCopy(i,j).isOccupied())
+
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 4) {
+                    coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j;
+                    coordinates += j+1;
                     return coordinates;
                 }
             }
@@ -530,14 +547,44 @@ public class Bot0 implements BotAPI {
         //check for tiles with value 3
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).getTile().getValue() == 3) {
-                    coordinates += i;
+                if(board.getSquareCopy(i,j).isOccupied())
+
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 3) {
+                    coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j;
+                    coordinates += j+1;
                     return coordinates;
                 }
             }
         }
+        //check for tiles with value 2
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if(board.getSquareCopy(i,j).isOccupied())
+
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 2) {
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        return coordinates;
+                    }
+            }
+        }
+
+        //check for tiles with value 1
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isOccupied())
+
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 1) {
+                        coordinates += i + 1;
+                        coordinates += " ";
+                        coordinates += j + 1;
+                        return coordinates;
+                    }
+            }
+        }
+        System.out.println("coordintaes mfka joenes: " + coordinates);
         return coordinates;
     }
 
