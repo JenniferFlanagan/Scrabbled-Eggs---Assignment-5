@@ -15,6 +15,7 @@ public class Bot0 implements BotAPI {
     private UserInterfaceAPI info;
     private DictionaryAPI dictionary;
     private int turnCount;
+    private boolean firstMove = true;
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
@@ -42,10 +43,11 @@ public class Bot0 implements BotAPI {
     public String PlaceFirstWord() {
             System.out.println(frameToString());
             String frame = "";
-            if (board.isFirstPlay()) {
+            if (/*board.isFirstPlay() */ firstMove) {
                 //Put tiles from frame into a word
                 frame = frameToString();
                 //frame = frame.substring(1);
+                firstMove = false;
             }
 
             int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
@@ -53,50 +55,85 @@ public class Bot0 implements BotAPI {
             if(numBlanks > 0) //Remove blank tiles
                 frame = frame.replaceAll("_", "A");
 
-
-            words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
-
-            String temp = frame;
-            int counter = 0; //Counter for removing a letter from the perumation string if no valid words can be found
-            while(words.size() == 0 && !exchangeFlag)
-            {
-                frame = removeLowestLetter(frame);
-                words = getPermutation(frame, "", words);
-            }
-
-            if(exchangeFlag)
-            {
-                return "";
-            }
+            return placeWord(frame,numBlanks);
 
 
-            String word = getHighWordScore();
-
-            if(numBlanks > 0) //Add the blanks back
-            {
-                word.replaceAll("A","_");
-            }
-            String command = "";
-            if (frame != "") {
-                command += "H8 ";
-                command += "A ";
-                command += word + " ";
 
 
-                for (int i = 0; i < word.length(); i++) {
-                    if (word.charAt(i) == Tile.BLANK) {
-                        command += "A";
-                    } else {
-                        continue;
-                    }
-                }
-
-            }
-            System.out.println(command);
-
-            return command;
     }
+    public String placeWordValTile()
+    {
 
+        if(firstMove)  //Skip when it's the first move
+            return "";
+
+        //Get coordinates (row and column) and store in integers
+        String coordinates = placeValTile();
+        String[] coordsArr = coordinates.split(" ");
+        String colStr = coordsArr[1];
+        String rowStr = coordsArr[0];
+        int col = Integer.parseInt(colStr);
+        int row = Integer.parseInt(rowStr);
+
+
+        //Combine the frame and the high val tile to a string and find permutations
+        String valTile = String.valueOf(board.getSquareCopy(row,col).getTile().getLetter());
+        String frame = frameToString();
+
+        String word = frame + valTile;
+
+        int numBlanks = getNumBlanks(word);
+        if(numBlanks > 0) //Remove blank tiles
+            word = word.replaceAll("_", "A");
+
+        //get word permutations and score
+        words = getPermutation(word,"",words);
+
+        int highValIndex = 0;
+        String placement = "";
+        for(int i = 0; i < words.size(); i++)
+        {
+            String tryWord = words.get(i);  //ith valid word
+            for(int j = 0; j < tryWord.length(); j++)
+            {
+                if(String.valueOf(tryWord.charAt(i)) == valTile)
+                {
+                    highValIndex = j;
+                    break;
+                }
+            }
+            placement = findValidPlacement(row, col, word, highValIndex); //Get a valid word placement
+            if(placement != "")
+                break;          //If there was no valid word placement, check next word
+        }
+
+
+        if(numBlanks > 0) //Add the blanks back
+        {
+            placement.replaceAll("B","_");
+        }
+
+
+        for (int i = 0; i < placement.length(); i++) {
+            if (placement.charAt(i) == Tile.BLANK) {
+                placement += "B";
+            } else {
+                continue;
+            }
+
+            resetArrayLists();
+            return placement;
+        }
+
+
+
+
+
+
+
+
+        return "";
+    }
 
 
     //Functions
@@ -105,7 +142,7 @@ public class Bot0 implements BotAPI {
         // Add your code here to input your commands
         // Your code must give the command NAME <botname> at the start of the game
         String command = "";
-
+        /*
         switch (turnCount) {
             case 0:
                // command = PlaceFirstWord();//"NAME Bot0";
@@ -129,28 +166,27 @@ public class Bot0 implements BotAPI {
         }
         turnCount++;
 
-
+        */
         //getHighestWord();
-        command = PlaceFirstWord();
+        command = makeBestMove();
         return command;
     }
+
+
     public String makeBestMove()
     {
         String command = "";
         command = PlaceFirstWord();
 
+
+        if(command == "")
+            command = placeWordValTile();
+        else return command;
+
         if (command == "" && exchangeFlag == true){
             command = exchange();
         }else return command;
 
-        // command == "" and && exchangeFlag == true
-        //then exchange
-        //command = EXCHANGE letters
-        //return command
-
-        if(command == "")
-            command = checkValuableSquare();
-        else return command;
 
         if(command == "")
             return command;
@@ -162,6 +198,8 @@ public class Bot0 implements BotAPI {
 
         return command;
     }
+
+
 
     private String exchange() {
 
@@ -272,7 +310,7 @@ public class Bot0 implements BotAPI {
         else return !isHorizontal;
     }
 
-    /*
+
     private String highestWord(int length)
     {
         String user_frame = me.getFrameAsString();
@@ -366,7 +404,7 @@ public class Bot0 implements BotAPI {
         return "";
     }
 
-     */
+
 
 
     private String getHighestWord(int row, int col) {
@@ -624,5 +662,121 @@ public class Bot0 implements BotAPI {
         return newWord;
     }
 
+    private String placeWord(String frame,  int numBlanks)
+    {
+        words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
+
+        String temp = frame;
+        int counter = 0; //Counter for removing a letter from the perumation string if no valid words can be found
+        while(words.size() == 0 && !exchangeFlag)
+        {
+            frame = removeLowestLetter(frame);
+            words = getPermutation(frame, "", words);
+        }
+
+        if(exchangeFlag)
+        {
+            return "";
+        }
+
+
+        String word = getHighWordScore();
+
+        if(numBlanks > 0) //Add the blanks back
+        {
+            word.replaceAll("A","_");
+        }
+        String command = "";
+        if (frame != "") {
+            command += "H8 ";
+            command += "A ";
+            command += word + " ";
+
+
+            for (int i = 0; i < word.length(); i++) {
+                if (word.charAt(i) == Tile.BLANK) {
+                    command += "A";
+                } else {
+                    continue;
+                }
+            }
+
+        }
+        System.out.println(command);
+        resetArrayLists();
+        return command;
+    }
+
+    private void resetArrayLists()
+    {
+        words.clear();
+        word_score.clear();
+    }
+
+
+    /* Finds a valid placement to place a word (tileIndex is the index of the tile from the board in string word) */
+    private String findValidPlacement(int row, int col, String word, int tileIndex)
+    {
+        //Create frame with bot's frame (for converting String to Word)
+        Frame frameObj = new Frame();
+        ArrayList<Tile> tileArray = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++)
+            tileArray.add(new Tile(word.charAt(i)));
+        frameObj.addTiles(tileArray);
+
+        String sRow = "";
+
+        //Try horizontal
+        int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
+        Word horWord = new Word(row, horCol, true, word, "B");
+
+
+        if (board.isLegalPlay(frameObj, horWord)) {
+            sRow = getLetterRow(row);
+            return sRow + " " + horCol + " A " + horWord.getLetters();
+        }
+
+
+        //Try vertical
+        int verRow = row - tileIndex; //Get the starting row index (above tile index)
+        Word verWord = new Word(verRow, col, false, word, "B");
+
+        if (board.isLegalPlay(frameObj, verWord)) {
+            sRow = getLetterRow(verRow);
+            return sRow + " " + col + " D " + horWord.getLetters();
+        }
+
+
+
+        //otherwise, return blank
+        return "";
+
+
+    }
+
+    private String getLetterRow(int i)
+    {
+        switch (i)
+        {
+            case 1: return "A";
+            case 2: return "B";
+            case 3: return "C";
+            case 4: return "D";
+            case 5: return "E";
+            case 6: return "F";
+            case 7: return "G";
+            case 8: return "H";
+            case 9: return "I";
+            case 10: return "J";
+            case 11: return "K";
+            case 12: return "L";
+            case 13: return "M";
+            case 14: return "N";
+            case 15: return "O";
+
+
+            default: return "";
+        }
+    }
 
 }
