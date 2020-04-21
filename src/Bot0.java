@@ -62,18 +62,18 @@ public class Bot0 implements BotAPI {
 
 
     }
-    public String placeWordValTile()
+    public String placeWordValTile(String coordinates)
     {
 
         if(firstMove)  //Skip when it's the first move
             return "";
 
         //Get coordinates (row and column) and store in integers
-        String coordinates = placeValTile();
-        if(coordinates == "")
-        {
-            return "";
-        }
+
+//        if(coordinates == "")
+//        {
+//            return "";
+//        }
         String[] coordsArr = coordinates.split(" ");
         String colStr = coordsArr[1];
         String rowStr = coordsArr[0];
@@ -93,6 +93,15 @@ public class Bot0 implements BotAPI {
 
         //get word permutations and score
         words = getPermutation(word,"",words);
+        String tempWord = word;
+        while(words.size() == 0 && tempWord.length() > 0)
+        {
+            words = getPermutation(tempWord,"",words);
+            tempWord = removeLowestLetter(tempWord,valTile.charAt(0));
+        }
+
+
+        if(words.size() == 0) return "";
 
         int highValIndex = 0;
         String placement = "";
@@ -101,13 +110,14 @@ public class Bot0 implements BotAPI {
             String tryWord = words.get(i);  //ith valid word
             for(int j = 0; j < tryWord.length(); j++)
             {
-                if(String.valueOf(tryWord.charAt(i)) == valTile)
+                String currChar = String.valueOf(tryWord.charAt(j));
+                if(currChar.equals(valTile))
                 {
                     highValIndex = j;
                     break;
                 }
             }
-            placement = findValidPlacement(row, col, word, highValIndex); //Get a valid word placement
+            placement = findValidPlacement(row, col, tryWord, highValIndex); //Get a valid word placement
             if(placement != "")
                 break;          //If there was no valid word placement, check next word
         }
@@ -129,15 +139,8 @@ public class Bot0 implements BotAPI {
             resetArrayLists();
             return placement;
         }
-
-
-
-
-
-
-
-
-        return "";
+        resetArrayLists();
+        return placement;
     }
 
 
@@ -189,7 +192,7 @@ public class Bot0 implements BotAPI {
 
 
         if(command == "")
-            command = placeWordValTile();
+            command = placeValTile();
         else return command;
 
         if (command == "" && exchangeFlag == true){
@@ -488,17 +491,23 @@ public class Bot0 implements BotAPI {
 
     public String placeValTile() {
 
-        String coordinates = "";
+
 
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
                 if (board.getSquareCopy(i, j).getTile().getValue() == 10) {
+                    String coordinates = "";
                     coordinates += i+1;
                     coordinates += " ";
-                    coordinates += j+1; //je suis fini
-                    return coordinates;
+                    coordinates += j+1;
+
+                    String isPossible = placeWordValTile(coordinates);
+                    if(isPossible != "")
+                    {
+                        return isPossible;
+                    }
                 }
             }
         }
@@ -508,10 +517,15 @@ public class Bot0 implements BotAPI {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
                     if (board.getSquareCopy(i, j).getTile().getValue() == 8) {
+                    String coordinates = "";
                     coordinates += i+1;
                     coordinates += " ";
                     coordinates += j+1;
-                    return coordinates;
+                    String isPossible = placeWordValTile(coordinates);
+                    if(isPossible != "")
+                    {
+                        return isPossible;
+                    }
                 }
             }
         }
@@ -522,10 +536,15 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 5) {
+                    String coordinates = "";
                     coordinates += i+1;
                     coordinates += " ";
                     coordinates += j+1;
-                    return coordinates;
+                    String isPossible = placeWordValTile(coordinates);
+                    if(isPossible != "")
+                    {
+                        return isPossible;
+                    }
                 }
             }
         }
@@ -536,10 +555,15 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 4) {
+                    String coordinates = "";
                     coordinates += i+1;
                     coordinates += " ";
                     coordinates += j+1;
-                    return coordinates;
+                    String isPossible = placeWordValTile(coordinates);
+                    if(isPossible != "")
+                    {
+                        return isPossible;
+                    }
                 }
             }
         }
@@ -550,10 +574,15 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 3) {
+                    String coordinates = "";
                     coordinates += i+1;
                     coordinates += " ";
                     coordinates += j+1;
-                    return coordinates;
+                    String isPossible = placeWordValTile(coordinates);
+                    if(isPossible != "")
+                    {
+                        return isPossible;
+                    }
                 }
             }
         }
@@ -563,10 +592,15 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 2) {
+                        String coordinates = "";
                         coordinates += i+1;
                         coordinates += " ";
                         coordinates += j+1;
-                        return coordinates;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
             }
         }
@@ -577,15 +611,19 @@ public class Bot0 implements BotAPI {
                 if (board.getSquareCopy(i, j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 1) {
+                        String coordinates = "";
                         coordinates += i + 1;
                         coordinates += " ";
                         coordinates += j + 1;
-                        return coordinates;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
             }
         }
-        System.out.println("coordintaes mfka joenes: " + coordinates);
-        return coordinates;
+        return "";
     }
 
     private String isValidMove(String word, int col, int row) {
@@ -598,7 +636,7 @@ public class Bot0 implements BotAPI {
                 index = i;
         }
 
-        //Convert String word to Word object
+        //Convert String word to Word objectf
         Word wordObj = new Word(row, col, true, word);
         Frame frameObj = new Frame();
         ArrayList<Tile> tileArray = new ArrayList<>();
@@ -709,6 +747,36 @@ public class Bot0 implements BotAPI {
         return newWord;
     }
 
+    private String removeLowestLetter(String word, char noRemove) //With a character you don't want removed
+    {
+        if(word.length() == 0)
+        {
+            exchangeFlag = true;
+        }
+        int min = 11;
+        int minIndex = 0;
+        String minChar = "";
+        for(int i = 0; i < word.length(); i++) // Remove min character
+        {
+            Tile getVal = new Tile(word.charAt(i));
+            if(min > getVal.getValue() && getVal.getLetter() != noRemove) {
+                min = getVal.getValue();
+                minChar = String.valueOf(word.charAt(i));
+                minIndex = i;
+            }
+        }
+        String newWord = "";
+        for(int i = 0; i < word.length(); i++)
+        {
+            if(minChar != "")
+            {
+                if(word.charAt(i) !=  minChar.charAt(0))
+                    newWord += word.charAt(i);
+            }
+
+        }
+        return newWord;
+    }
     private String placeWord(String frame,  int numBlanks)
     {
         words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
@@ -775,22 +843,24 @@ public class Bot0 implements BotAPI {
 
         //Try horizontal
         int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
-        Word horWord = new Word(row, horCol, true, word, "B");
+        Word horWord = new Word(row-1, horCol-1, true, word, "B");
 
 
         if (board.isLegalPlay(frameObj, horWord)) {
             sRow = getLetterRow(row);
-            return sRow + " " + horCol + " A " + horWord.getLetters();
+            return sRow + horCol + " A " + horWord.getLetters();
         }
 
 
         //Try vertical
-        int verRow = row - tileIndex; //Get the starting row index (above tile index)
-        Word verWord = new Word(verRow, col, false, word, "B");
+        int verCol = col; //Get the starting row index (above tile index)
+        int verRow = row - tileIndex;
+        Word verWord = new Word(verCol-1, verRow-1, false, word, "B");
 
         if (board.isLegalPlay(frameObj, verWord)) {
-            sRow = getLetterRow(verRow);
-            return sRow + " " + col + " D " + horWord.getLetters();
+            sRow = getLetterRow(verCol);
+
+            return sRow + verRow +  " D " + horWord.getLetters();
         }
 
 
