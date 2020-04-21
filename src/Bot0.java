@@ -18,6 +18,7 @@ public class Bot0 implements BotAPI {
     private boolean firstMove = true;
     private boolean firstWord = true;
     private int turnCounter = 0;
+    private boolean connectingWords = false;
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
@@ -90,7 +91,7 @@ public class Bot0 implements BotAPI {
 
         int numBlanks = getNumBlanks(word);
         if(numBlanks > 0) //Remove blank tiles
-            word = word.replaceAll("_", "A");
+            word = word.replaceAll("_", "B");
 
         //get word permutations and score
         words = getPermutation(word,"",words);
@@ -126,20 +127,22 @@ public class Bot0 implements BotAPI {
 
         if(numBlanks > 0) //Add the blanks back
         {
-            placement.replaceAll("B","_");
+            placement = ReplaceBlank(placement);
+//            placement.replaceAll("B","_");
+              System.out.println(placement + " <---");
+            placement += " ";
         }
 
 
-        for (int i = 0; i < placement.length(); i++) {
-            if (placement.charAt(i) == Tile.BLANK) {
+        if(numBlanks >0 && placement.length() > 1)
+        for (int i = 0; i < placement.length(); i++)
+        {
+            if (placement.charAt(i) == Tile.BLANK)
                 placement += "B";
-            } else {
+             else
                 continue;
-            }
-
-            resetArrayLists();
-            return placement;
         }
+
         resetArrayLists();
         return placement;
     }
@@ -180,6 +183,8 @@ public class Bot0 implements BotAPI {
         command = makeBestMove();
         if(command != "")
             turnCounter++;
+
+        System.out.println(command);
         return command;
     }
 
@@ -211,7 +216,6 @@ public class Bot0 implements BotAPI {
         {
 
         }
-
         return command;
     }
 
@@ -835,6 +839,8 @@ public class Bot0 implements BotAPI {
     /* Finds a valid placement to place a word (tileIndex is the index of the tile from the board in string word) */
     private String findValidPlacement(int row, int col, String word, int tileIndex)
     {
+
+
         //Create frame with bot's frame (for converting String to Word)
         Frame frameObj = new Frame();
         ArrayList<Tile> tileArray = new ArrayList<>();
@@ -845,10 +851,6 @@ public class Bot0 implements BotAPI {
         String sRow = "";
 
 //        //Try horizontal
-        if(turnCounter > 2 && word != "")
-        {
-            System.out.println();
-        }
         int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
         Word horWord = new Word(row-1,  horCol-1, true, word, "B");
 
@@ -903,4 +905,17 @@ public class Bot0 implements BotAPI {
         }
     }
 
+    private String ReplaceBlank(String placement)
+    {
+        String newPlacement = "";
+        for(int i = 0; i < placement.length(); i++)
+        {
+            if(placement.charAt(i) != 'B')
+                newPlacement += placement.charAt(i);
+            else
+                newPlacement += '_';
+        }
+        return newPlacement;
+    }
 }
+
