@@ -845,24 +845,25 @@ public class Bot0 implements BotAPI {
         String sRow = "";
 
 //        //Try horizontal
+        if(turnCounter > 2 && word != "")
+        {
+            System.out.println();
+        }
         int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
-        Word horWord = new Word(horCol-1, row-1, true, word, "B");
-//
-//
-//        if (board.isLegalPlay(frameObj, horWord)) {
-//            sRow = getLetterRow(row);
-//            return sRow + horCol + " A " + horWord.getLetters();
-//        }
+        Word horWord = new Word(row-1,  horCol-1, true, word, "B");
+
+
+        if (board.isLegalPlay(frameObj, horWord)) {
+            sRow = getLetterRow(horCol);
+            return sRow + row + " A " + horWord.getLetters();
+        }
 
 
         //Try vertical
         int verCol = col; //Get the starting row index (above tile index)
         int verRow = row - tileIndex;
         Word verWord = new Word(verRow-1, verCol-1, false, word, "B");
-        if(turnCounter == 3 && word != "")
-        {
-            System.out.println();
-        }
+
         if (board.isLegalPlay(frameObj, verWord)) {
             sRow = getLetterRow(verCol);
 
