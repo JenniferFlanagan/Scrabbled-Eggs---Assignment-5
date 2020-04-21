@@ -17,6 +17,7 @@ public class Bot0 implements BotAPI {
     private int turnCount;
     private boolean firstMove = true;
     private boolean firstWord = true;
+    private int turnCounter = 0;
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
@@ -177,6 +178,8 @@ public class Bot0 implements BotAPI {
         */
         //getHighestWord();
         command = makeBestMove();
+        if(command != "")
+            turnCounter++;
         return command;
     }
 
@@ -841,22 +844,25 @@ public class Bot0 implements BotAPI {
 
         String sRow = "";
 
-        //Try horizontal
+//        //Try horizontal
         int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
-        Word horWord = new Word(row-1, horCol-1, true, word, "B");
-
-
-        if (board.isLegalPlay(frameObj, horWord)) {
-            sRow = getLetterRow(row);
-            return sRow + horCol + " A " + horWord.getLetters();
-        }
+        Word horWord = new Word(horCol-1, row-1, true, word, "B");
+//
+//
+//        if (board.isLegalPlay(frameObj, horWord)) {
+//            sRow = getLetterRow(row);
+//            return sRow + horCol + " A " + horWord.getLetters();
+//        }
 
 
         //Try vertical
         int verCol = col; //Get the starting row index (above tile index)
         int verRow = row - tileIndex;
-        Word verWord = new Word(verCol-1, verRow-1, false, word, "B");
-
+        Word verWord = new Word(verRow-1, verCol-1, false, word, "B");
+        if(turnCounter == 3 && word != "")
+        {
+            System.out.println();
+        }
         if (board.isLegalPlay(frameObj, verWord)) {
             sRow = getLetterRow(verCol);
 
