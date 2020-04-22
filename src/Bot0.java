@@ -119,7 +119,9 @@ public class Bot0 implements BotAPI {
                     break;
                 }
             }
-            placement = findValidPlacement(row, col, tryWord, highValIndex); //Get a valid word placement
+            try {
+                placement = findValidPlacement(row, col, tryWord, highValIndex); //Get a valid word placement
+            }catch(IndexOutOfBoundsException e){}
             if(placement != "")
                 break;          //If there was no valid word placement, check next word
         }
