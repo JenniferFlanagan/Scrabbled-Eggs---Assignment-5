@@ -129,21 +129,24 @@ public class Bot0 implements BotAPI {
 
         if(numBlanks > 0) //Add the blanks back
         {
-            placement = ReplaceBlank(placement);
+            if(placement.length() > 1) {
+                placement = ReplaceBlank(placement, 'B');
 //            placement.replaceAll("B","_");
-              System.out.println(placement + " <---");
-            placement += " ";
+                System.out.println(placement + " <---");
+                placement += " ";
+            }
         }
 
 
         if(numBlanks >0 && placement.length() > 1)
         for (int i = 0; i < placement.length(); i++)
         {
-            if (placement.charAt(i) == Tile.BLANK)
+            if (placement.charAt(i) == Tile.BLANK){
                 placement += "B";
-             else
-                continue;
+                break;
+            }
         }
+
 
         resetArrayLists();
         return placement;
@@ -221,9 +224,15 @@ public class Bot0 implements BotAPI {
         return command;
     }
 
-
+    private boolean isChallenge(){
+        if (turnCount % 4 == 0) {
+            return true;
+        }
+        return false;
+    }
 
     private String exchange() {
+
 
         String letters = "";
         String stringRack = frameToString();
@@ -700,12 +709,6 @@ public class Bot0 implements BotAPI {
         }
     }
 
-    private boolean isChallenge(){
-        if (turnCount % 4 == 0) {
-            return true;
-        }
-        return false;
-    }
 
 
     private int getNumBlanks(String word)
@@ -808,7 +811,7 @@ public class Bot0 implements BotAPI {
 
         if(numBlanks > 0) //Add the blanks back
         {
-            word.replaceAll("A","_");
+            word = ReplaceBlank(word, 'A');
         }
         String command = "";
         if (frame != "") {
@@ -820,12 +823,12 @@ public class Bot0 implements BotAPI {
             for (int i = 0; i < word.length(); i++) {
                 if (word.charAt(i) == Tile.BLANK) {
                     command += "A";
-                } else {
-                    continue;
+                    break;
+                }
                 }
             }
 
-        }
+
         System.out.println(command);
         resetArrayLists();
         return command;
@@ -907,15 +910,16 @@ public class Bot0 implements BotAPI {
         }
     }
 
-    private String ReplaceBlank(String placement)
+    private String ReplaceBlank(String placement, char designation)
     {
         String newPlacement = "";
         for(int i = 0; i < placement.length(); i++)
         {
-            if(placement.charAt(i) != 'B')
+            if(placement.charAt(i) != designation)
                 newPlacement += placement.charAt(i);
             else
-                newPlacement += '_';
+
+               if(i != 0) newPlacement += '_';
         }
         return newPlacement;
     }
