@@ -937,13 +937,13 @@ public class Bot0 implements BotAPI {
         String newPlacement = "";
         for(int i = 0; i < placement.length(); i++)
         {
-            if(placement.charAt(i) != designation && numBlanks!=0) {
+            if(placement.charAt(i) != designation ) {
                 newPlacement += placement.charAt(i);
                 numBlanks--;
             }
 
             else
-               if(i != 0) newPlacement += '_';
+               if(i != 0 && numBlanks!=0) newPlacement += '_';
         }
         return newPlacement;
     }
