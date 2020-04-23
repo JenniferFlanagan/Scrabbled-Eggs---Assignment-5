@@ -42,7 +42,6 @@ public class Bot0 implements BotAPI {
     //6. Place word.
     //7. If word cannot be placed, pass
 
-
     public String PlaceFirstWord() {
             System.out.println(frameToString());
             String frame = "";
@@ -66,10 +65,8 @@ public class Bot0 implements BotAPI {
     }
     public String placeWordValTile(String coordinates)
     {
-
         if(firstMove)  //Skip when it's the first move
             return "";
-
         //Get coordinates (row and column) and store in integers
 
 //        if(coordinates == "")
@@ -81,7 +78,6 @@ public class Bot0 implements BotAPI {
         String rowStr = coordsArr[0];
         int col = Integer.parseInt(colStr);
         int row = Integer.parseInt(rowStr);
-
 
         //Combine the frame and the high val tile to a string and find permutations
         String valTile = String.valueOf(board.getSquareCopy(row-1,col-1).getTile().getLetter());
@@ -130,8 +126,8 @@ public class Bot0 implements BotAPI {
         if(numBlanks > 0) //Add the blanks back
         {
             if(placement.length() > 1) {
-                placement = ReplaceBlank(placement, 'B');
-//            placement.replaceAll("B","_");
+                placement = ReplaceBlank(placement, 'B', numBlanks);
+                //placement.replaceAll("B","_");
                 System.out.println(placement + " <---");
                 placement += " ";
             }
@@ -159,9 +155,73 @@ public class Bot0 implements BotAPI {
         String[] coordsArr = coordinates.split(" ");
         String colStr = coordsArr[1];
         String rowStr = coordsArr[0];
+
         int col = Integer.parseInt(colStr);
         int row = Integer.parseInt(rowStr);
 
+
+
+
+
+
+        return "";
+    }
+
+    private String getLongestWord(int i, int j)
+    {
+        boolean isHorizontal = true;
+        int row = i;
+        int col = j;
+        int max_length = 7;
+        int curr_length = 0;
+        ArrayList<Integer> longest = new ArrayList<>();
+
+        //Check if the longest word is horizontal with the first letter beginning on the square
+        while( !board.getSquareCopy(row,col).isOccupied() && col <15 && curr_length != 7)
+        {
+            col++;
+            curr_length++;
+        }
+        if(curr_length == 7 && isConnectingHorizontal(row,col)) //Found longest possible word
+        {
+
+        }
+        else
+        {
+            longest.add(curr_length);
+            curr_length = 0;
+            col = j;
+        }
+
+        //Check if the longest word is vertical with the first letter beginning on the square
+        while( !board.getSquareCopy(row,col).isOccupied() && row <15 && curr_length != 7 )
+        {
+            row++;
+            curr_length++;
+        }
+        if(curr_length == 7 && isConnectingVertical(row,col)) //Found longest possible word
+        {
+
+        }
+        else
+        {
+            longest.add(curr_length);
+            curr_length =0;
+            row = i;
+        }
+
+        //Find max
+        int temp = longest.get(i);
+        int highestIndex =0;
+        for(int index = 1; index<longest.size(); index++)
+        {
+            if(longest.get(index) > temp)
+            {
+                temp = longest.get(index);
+                highestIndex = index;
+            }
+        }
+        String word = highestWord(longest.get(highestIndex));
 
         return "";
     }
@@ -337,64 +397,6 @@ public class Bot0 implements BotAPI {
 
 
 
-    private String getLongestWord(int i, int j)
-    {
-        boolean isHorizontal = true;
-        int row = i;
-        int col = j;
-        int max_length = 7;
-        int curr_length = 0;
-        ArrayList<Integer> longest = new ArrayList<>();
-
-        //Check if the longest word is horizontal with the first letter beginning on the square
-        while( !board.getSquareCopy(row,col).isOccupied() && col <15 && curr_length != 7)
-        {
-            col++;
-            curr_length++;
-        }
-        if(curr_length == 7 && isConnectingHorizontal(row,col)) //Found longest possible word
-        {
-
-        }
-        else
-        {
-            longest.add(curr_length);
-            curr_length = 0;
-            col = j;
-        }
-
-        //Check if the longest word is vertical with the first letter beginning on the square
-        while( !board.getSquareCopy(row,col).isOccupied() && row <15 && curr_length != 7 )
-        {
-            row++;
-            curr_length++;
-        }
-        if(curr_length == 7 && isConnectingVertical(row,col)) //Found longest possible word
-        {
-
-        }
-        else
-        {
-            longest.add(curr_length);
-            curr_length =0;
-            row = i;
-        }
-
-        //Find max
-        int temp = longest.get(i);
-        int highestIndex =0;
-        for(int index = 1; index<longest.size(); index++)
-        {
-            if(longest.get(index) > temp)
-            {
-                temp = longest.get(index);
-                highestIndex = index;
-            }
-        }
-        String word = highestWord(longest.get(highestIndex));
-
-        return "";
-    }
 
 
 
@@ -468,7 +470,6 @@ public class Bot0 implements BotAPI {
     }
 
     public String placeValTile() {
-
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -478,7 +479,6 @@ public class Bot0 implements BotAPI {
                     coordinates += i+1;
                     coordinates += " ";
                     coordinates += j+1;
-
                     String isPossible = placeWordValTile(coordinates);
                     if(isPossible != "")
                     {
@@ -566,7 +566,6 @@ public class Bot0 implements BotAPI {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
-
                     if (board.getSquareCopy(i, j).getTile().getValue() == 2) {
                         String coordinates = "";
                         coordinates += i+1;
@@ -602,10 +601,7 @@ public class Bot0 implements BotAPI {
         return "";
     }
 
-
     public String checkValuableSquare() {
-
-
         //Check for empty triple word scores
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -837,7 +833,7 @@ public class Bot0 implements BotAPI {
 
         if(numBlanks > 0) //Add the blanks back
         {
-            word = ReplaceBlank(word, 'A');
+            word = ReplaceBlank(word, 'A', numBlanks);
         }
         String command = "";
         if (frame != "") {
@@ -936,13 +932,16 @@ public class Bot0 implements BotAPI {
         }
     }
 
-    private String ReplaceBlank(String placement, char designation)
+    private String ReplaceBlank(String placement, char designation, int numBlanks)
     {
         String newPlacement = "";
         for(int i = 0; i < placement.length(); i++)
         {
-            if(placement.charAt(i) != designation)
+            if(placement.charAt(i) != designation && numBlanks!=0) {
                 newPlacement += placement.charAt(i);
+                numBlanks--;
+            }
+
             else
                if(i != 0) newPlacement += '_';
         }
