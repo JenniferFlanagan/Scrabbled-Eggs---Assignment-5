@@ -153,6 +153,19 @@ public class Bot0 implements BotAPI {
     }
 
 
+    private String placeWordValSquare(String coordinates)
+    {
+        //Store coordinates in row and col arrays;
+        String[] coordsArr = coordinates.split(" ");
+        String colStr = coordsArr[1];
+        String rowStr = coordsArr[0];
+        int col = Integer.parseInt(colStr);
+        int row = Integer.parseInt(rowStr);
+
+
+        return "";
+    }
+
     //Functions
     //1. Place Best Word
     public String getCommand() {
@@ -204,6 +217,7 @@ public class Bot0 implements BotAPI {
         else firstWord = false;
 
 
+
         if(command == "")
             command = placeValTile();
         else return command;
@@ -249,61 +263,7 @@ public class Bot0 implements BotAPI {
     }
 
     /* Checks if there are any empty valuable squares and returns the coordinates if found */
-    public String checkValuableSquare() {
-        String coordinates = "";
 
-        //Check for empty triple word scores
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).isTripleWord() && !board.getSquareCopy(i, j).isOccupied()) {
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //Check for empty double word scores
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).isDoubleWord() && !board.getSquareCopy(i, j).isOccupied()) {
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //Check for empty triple letter scores
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).isTripleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-
-        //Check for double letter scores
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                if (board.getSquareCopy(i, j).isDoubleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
-                    coordinates += i;
-                    coordinates += " ";
-                    coordinates += j;
-                    return coordinates;
-                }
-            }
-        }
-
-        //Else return blank
-        return coordinates;
-    }
 
 
     public boolean isPlaceable(int i, int j) {
@@ -509,8 +469,6 @@ public class Bot0 implements BotAPI {
 
     public String placeValTile() {
 
-
-
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -644,6 +602,76 @@ public class Bot0 implements BotAPI {
         return "";
     }
 
+
+    public String checkValuableSquare() {
+
+
+        //Check for empty triple word scores
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isTripleWord() && !board.getSquareCopy(i, j).isOccupied()) {
+                    String coordinates = "";
+                    coordinates += i+1;
+                    coordinates += " ";
+                    coordinates += j+1;
+
+                    String isPossible = placeWordValSquare(coordinates);
+                    if(isPossible != "")
+                        return isPossible;
+                }
+            }
+        }
+
+        //Check for empty double word scores
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isDoubleWord() && !board.getSquareCopy(i, j).isOccupied()) {
+                    String coordinates = "";
+                    coordinates += i+1;
+                    coordinates += " ";
+                    coordinates += j+1;
+
+                    String isPossible = placeWordValSquare(coordinates);
+                    if(isPossible != "")
+                        return isPossible;
+                }
+            }
+        }
+
+        //Check for empty triple letter scores
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isTripleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
+                    String coordinates = "";
+                    coordinates += i+1;
+                    coordinates += " ";
+                    coordinates += j+1;
+
+                    String isPossible = placeWordValSquare(coordinates);
+                    if(isPossible != "")
+                        return isPossible;
+                }
+            }
+        }
+
+
+        //Check for double letter scores
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (board.getSquareCopy(i, j).isDoubleLetter() && !board.getSquareCopy(i, j).isOccupied()) {
+                    String coordinates = "";
+                    coordinates += i+1;
+                    coordinates += " ";
+                    coordinates += j+1;
+
+                    String isPossible = placeWordValSquare(coordinates);
+                    if(isPossible != "")
+                        return isPossible;
+                }
+            }
+        }
+        return "";
+    }
     private String isValidMove(String word, int col, int row) {
         //Find index of string where the tile from the board is located in the word
         char valTile = board.getSquareCopy(row, col).getTile().getLetter();
@@ -666,8 +694,6 @@ public class Bot0 implements BotAPI {
         if (board.isLegalPlay(frameObj, wordObj)) {
             return col + " " + row + " " + wordObj.getLetters();
         } else
-
-
             return "";
     }
 
@@ -918,7 +944,6 @@ public class Bot0 implements BotAPI {
             if(placement.charAt(i) != designation)
                 newPlacement += placement.charAt(i);
             else
-
                if(i != 0) newPlacement += '_';
         }
         return newPlacement;

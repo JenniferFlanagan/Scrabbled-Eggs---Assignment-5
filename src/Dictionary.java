@@ -17,7 +17,9 @@ public class Dictionary implements DictionaryAPI {
             Node currentNode = root;
             for (int i=0; i<word.length(); i++) {
                 char currentLetter = word.charAt(i);
-                if (currentNode.isChild(currentLetter)) currentNode = currentNode.getChild(currentLetter);
+                if (currentNode.isChild(currentLetter)) {
+                    currentNode = currentNode.getChild(currentLetter);
+                }
                 else {
                     currentNode = currentNode.addChild(currentLetter);
                 }
