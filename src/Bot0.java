@@ -19,6 +19,7 @@ public class Bot0 implements BotAPI {
     private boolean firstWord = true;
     private int turnCounter = 0;
     private boolean connectingWords = false;
+    private int onBoardCounter = 0;
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
@@ -43,21 +44,21 @@ public class Bot0 implements BotAPI {
     //7. If word cannot be placed, pass
 
     public String PlaceFirstWord() {
-            System.out.println(frameToString());
-            String frame = "";
-            if (/*board.isFirstPlay() */ firstMove) {
-                //Put tiles from frame into a word
-                frame = frameToString();
-                //frame = frame.substring(1);
-                firstMove = false;
-            }
+        System.out.println(frameToString());
+        String frame = "";
+        if (/*board.isFirstPlay() */ firstMove) {
+            //Put tiles from frame into a word
+            frame = frameToString();
+            //frame = frame.substring(1);
+            firstMove = false;
+        }
 
-            int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
+        int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
 
-            if(numBlanks > 0) //Remove blank tiles
-                frame = frame.replaceAll("_", "A");
+        if(numBlanks > 0) //Remove blank tiles
+            frame = frame.replaceAll("_", "A");
 
-            return placeWord(frame,numBlanks);
+        return placeWord(frame,numBlanks);
 
 
 
@@ -135,13 +136,13 @@ public class Bot0 implements BotAPI {
 
 
         if(numBlanks >0 && placement.length() > 1)
-        for (int i = 0; i < placement.length(); i++)
-        {
-            if (placement.charAt(i) == Tile.BLANK){
-                placement += "B";
-                break;
+            for (int i = 0; i < placement.length(); i++)
+            {
+                if (placement.charAt(i) == Tile.BLANK){
+                    placement += "B";
+                    break;
+                }
             }
-        }
 
 
         resetArrayLists();
@@ -255,7 +256,6 @@ public class Bot0 implements BotAPI {
                 break;
         }
         turnCount++;
-
         */
         //getHighestWord();
         command = makeBestMove();
@@ -380,11 +380,11 @@ public class Bot0 implements BotAPI {
                 for(int i=0; i< user_frame.length(); i++)
                 {
                     Tile tile = new Tile(user_frame.charAt(i));
-                        if (tile.getValue() > max)
-                        {
-                            max = tile.getValue();
-                            maxLetter = user_frame.charAt(i);
-                        }
+                    if (tile.getValue() > max)
+                    {
+                        max = tile.getValue();
+                        maxLetter = user_frame.charAt(i);
+                    }
                 }
                 for(int i=0; i< user_frame.length(); i++)
                 {
@@ -474,17 +474,17 @@ public class Bot0 implements BotAPI {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
-                if (board.getSquareCopy(i, j).getTile().getValue() == 10) {
-                    String coordinates = "";
-                    coordinates += i+1;
-                    coordinates += " ";
-                    coordinates += j+1;
-                    String isPossible = placeWordValTile(coordinates);
-                    if(isPossible != "")
-                    {
-                        return isPossible;
+                    if (board.getSquareCopy(i, j).getTile().getValue() == 10) {
+                        String coordinates = "";
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
-                }
             }
         }
 
@@ -493,16 +493,16 @@ public class Bot0 implements BotAPI {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
                     if (board.getSquareCopy(i, j).getTile().getValue() == 8) {
-                    String coordinates = "";
-                    coordinates += i+1;
-                    coordinates += " ";
-                    coordinates += j+1;
-                    String isPossible = placeWordValTile(coordinates);
-                    if(isPossible != "")
-                    {
-                        return isPossible;
+                        String coordinates = "";
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
-                }
             }
         }
 
@@ -512,16 +512,16 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 5) {
-                    String coordinates = "";
-                    coordinates += i+1;
-                    coordinates += " ";
-                    coordinates += j+1;
-                    String isPossible = placeWordValTile(coordinates);
-                    if(isPossible != "")
-                    {
-                        return isPossible;
+                        String coordinates = "";
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
-                }
             }
         }
 
@@ -531,16 +531,16 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 4) {
-                    String coordinates = "";
-                    coordinates += i+1;
-                    coordinates += " ";
-                    coordinates += j+1;
-                    String isPossible = placeWordValTile(coordinates);
-                    if(isPossible != "")
-                    {
-                        return isPossible;
+                        String coordinates = "";
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
-                }
             }
         }
 
@@ -550,16 +550,16 @@ public class Bot0 implements BotAPI {
                 if(board.getSquareCopy(i,j).isOccupied())
 
                     if (board.getSquareCopy(i, j).getTile().getValue() == 3) {
-                    String coordinates = "";
-                    coordinates += i+1;
-                    coordinates += " ";
-                    coordinates += j+1;
-                    String isPossible = placeWordValTile(coordinates);
-                    if(isPossible != "")
-                    {
-                        return isPossible;
+                        String coordinates = "";
+                        coordinates += i+1;
+                        coordinates += " ";
+                        coordinates += j+1;
+                        String isPossible = placeWordValTile(coordinates);
+                        if(isPossible != "")
+                        {
+                            return isPossible;
+                        }
                     }
-                }
             }
         }
         //check for tiles with value 2
@@ -847,8 +847,8 @@ public class Bot0 implements BotAPI {
                     command += "A";
                     break;
                 }
-                }
             }
+        }
 
 
         System.out.println(command);
@@ -941,11 +941,37 @@ public class Bot0 implements BotAPI {
                 newPlacement += placement.charAt(i);
                 numBlanks--;
             }
-
             else
-               if(i != 0 && numBlanks!=0) newPlacement += '_';
+            if(i != 0 && numBlanks!=0) {
+                if(onBoardCounter >0)
+                {
+                    newPlacement += 'B';
+                    onBoardCounter--;
+                }
+                else
+                newPlacement += '_';
+            }
         }
         return newPlacement;
     }
-}
 
+    private void onBoardCheck(Word word )
+    {
+        int row = word.getRow();
+        int col = word.getColumn();
+
+        for(int i = 0; i < word.getLetters().length(); i++)
+        {
+            if(word.getLetters().charAt(i) == 'B' && word.isHorizontal())
+                if(board.getSquareCopy(row,col).isOccupied() && board.getSquareCopy(row + i, col).getTile().getLetter() == 'B')
+                {
+                    onBoardCounter++;
+                }
+                else if(word.getLetters().charAt(i) == 'B' && !word.isHorizontal())
+                    if(board.getSquareCopy(row,col).isOccupied() && board.getSquareCopy(row, col+i).getTile().getLetter() == 'B')
+                    {
+                        onBoardCounter++;
+                    }
+        }
+    }
+}
