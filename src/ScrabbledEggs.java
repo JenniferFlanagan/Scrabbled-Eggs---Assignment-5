@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Bot0 implements BotAPI {
+public class ScrabbledEggs implements BotAPI {
 
     // The public API of Bot must not change
     // This is ONLY class that you can edit in the program
@@ -9,30 +9,72 @@ public class Bot0 implements BotAPI {
     // Bot may not alter the state of the game objects
     // It may only inspect the state of the board and the player objects
 
+
+    /**
+     * Scrabbled Eggs Bot
+     * Our bot does the following:
+     *
+     * On the first move, it will try to place the highest scoring word starting with 7 letters (the whole frame) if a
+     * word cannot be placed, it will then remove the lowest value letter from the word and try again (6 letters this
+     * time). This continues until either a word is found or there's only one letter left.  In this scenario, the bot
+     * exchanges, randomly, 1-5 letters from the frame and then tries again. If the worst case occurs, the bot exchanges
+     * twice and then places a two letter word from the frame (the bot is aware the game will end if it doesn't place
+     * a word within three moves).
+     *
+     * When there are already tiles on the board, the bot checks to see if there is a vacant high value square (e.g
+     * triple word score). It will attempt all possible combinations of words to include that square and will place a
+     * word. If it cannot it will find another vacant high value square. If all are occupied it procedes to the next
+     * option.
+     *
+     * When there are already tiles on the borad, the bot then scans to see if it can find a tile worth 10 points. If it
+     * finds a tile, it tries all possible combinations of words including that tile.  If a word cannot be placed, it
+     * checks the next high value tile. This repeats from 10 point tiles down to 1 points (worst case)
+     *
+     * If the bot cannot place a word under these circumstances it will exchange tiles from its hand
+     *
+     * Every four moves the bot will challenge (functionality complete but not implemented currently for testing purposes)
+     *
+     * During the end game, when there are no tiles left in the pool, if the bot can't place a word, it's immediate
+     * response is to exchange. This causes the error "there are no tiles left in the pool to exchange", in this case
+     * the bot has been programmed to attempt the exchange three times and then "PASS" which will complete the game.
+     *
+     * Note: sometimes the bot doesn't get off to a good start trying to place words a the beginning, rarely, the bot
+     * won't be able to find a word to place even after exchanging three times and the game will end. We politely ask
+     * just to neglect that attempt and rerun the program.
+     *
+     * Lastly, we used a separate respository for assignment 5 so that it wouldn't clash with our own work from our own
+     * repository, since we wish to work and complete our rendition of scrabble over the summer. The link to the assignment
+     * 5 repo is here:
+     *https://github.com/JenniferFlanagan/Scrabbled-Eggs---Assignment-5?fbclid=IwAR1VSyWmGzEvzIFgycj_y-THHT6lfTldFOG6XR4atueAfcM1ZS-HY-wtJF0
+     * */
+
+    //Global variables
     private PlayerAPI me;
     private OpponentAPI opponent;
     private BoardAPI board;
     private UserInterfaceAPI info;
     private DictionaryAPI dictionary;
     private int turnCount;
-    private boolean firstMove = true;
-    private boolean firstWord = true;
+    private boolean firstMove = true; //If its the first move
+    private boolean firstWord = true; //If its the first word being placed (true when board is empty)
     private int turnCounter = 0;
     private boolean connectingWords = false;
-    private int onBoardCounter = 0;
-    private int noPlacementCount = 0;
-    private boolean placeFlag = false;
+    private int onBoardCounter = 0; //Counts how many designated letters already exist on the board
+    private int noPlacementCount = 0; //Number of times the bot has bot hasn't placed a word in a row
+    private boolean placeFlag = false; //If a command places a word, true
+    private int exchangeCounter = 0; //Amount of times the bot has exchagned in a row
 
     private ArrayList<Integer> word_score = new ArrayList<>(); //Stores corresponding score for each permuation
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
+    private boolean exchangeFlag = false; //If a word cannot be placed, turn true
 
-    private boolean exchangeFlag = false;
+
     //the i wanna be really smart array
-    int[] commonLetters = {2,11,10,11,1,11,11,11,4,11,11,9,11,7,5,11,//p
-            11,3,8,6,11,11,11,11,11,11};
+    int[] commonLetters = {2,11,10,11,1,11,11,11,4,11,11,9,11,7,5,11,
+            11,3,8,6,11,11,11,11,11,11}; //Rank of commonality for each letter of the alphabet
     String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    Bot0(PlayerAPI me, OpponentAPI opponent, BoardAPI board, UserInterfaceAPI ui, DictionaryAPI dictionary) {
+    ScrabbledEggs(PlayerAPI me, OpponentAPI opponent, BoardAPI board, UserInterfaceAPI ui, DictionaryAPI dictionary) {
         this.me = me;
         this.opponent = opponent;
         this.board = board;
@@ -41,58 +83,35 @@ public class Bot0 implements BotAPI {
         turnCount = 0;
     }
 
-    //1. Check valid moves
-    //2. Check if a word can be placed over Triple Word Score -> Double -> Triple letter -> double
-    //3. Check the board for a high value letter
-    //4. Combine letter from board with tiles in frame and consult dictionary for the highest possible word
-    //5. Repeat for all possible moves until the highest one is found
-    //6. Place word.
-    //7. If word cannot be placed, pass
 
     //1. Place Best Word
     public String getCommand() {
         // Add your code here to input your commands
         // Your code must give the command NAME <botname> at the start of the game
         String command = "";
-        /*
-        switch (turnCount) {
-            case 0:
-               // command = PlaceFirstWord();//"NAME Bot0";
-                command = "PASS";
-                break;
-            case 1:
-                command = "PASS";
-                break;
-            case 2:
-                command = "HELP";
-                break;
-            case 3:
-                command = "SCORE";
-                break;
-            case 4:
-                command = "POOL";
-                break;
-            default:
-                command = "H8 A AN";
-                break;
-        }
-        turnCount++;
 
-        */
-        //getHighestWord();
+        //Get best move
         command = makeBestMove();
+
         if(command != "")
             turnCounter++;
 
-        if(placeFlag)
+        if(placeFlag) //If a word is placed reset noPlacemenCount to 0
             noPlacementCount = 0;
 
-        System.out.println(command);
+      //  System.out.println(command);
+        if(!(command.contains("EXCHANGE"))) //Every time the bot doesn't exchange reset the exchange counter
+            exchangeCounter = 0;
+
+        if(exchangeCounter == 3) //In the case where there are no tiles left in the pool to exchange - pass
+            return "PASS";
+
+
         return command;
     }
 
     private String getAnyWord() { //Worst case, try and make a valid word placement
-        System.out.println("Miko is the big gay lel");
+
         String frame = "";
         StringBuilder appendLetter = new StringBuilder();
         String vowel = "";
@@ -156,7 +175,7 @@ public class Bot0 implements BotAPI {
         return "PASS";
     }
     public String PlaceFirstWord() {
-        System.out.println(frameToString());
+        // out.println(frameToString());
         String frame = "";
         if (/*board.isFirstPlay() */ firstMove) {
             //Put tiles from frame into a word
@@ -241,7 +260,7 @@ public class Bot0 implements BotAPI {
             if(placement.length() > 1) {
                 placement = ReplaceBlank(placement, 'B', numBlanks);
                 //placement.replaceAll("B","_");
-                System.out.println(placement + " <---");
+              //  System.out.println(placement + " <---");
                 placement += " ";
             }
         }
@@ -252,7 +271,7 @@ public class Bot0 implements BotAPI {
             {
                 if (placement.charAt(i) == Tile.BLANK){
                     placement += "B";
-                    break;
+                    //break;
                 }
             }
 
@@ -343,16 +362,22 @@ public class Bot0 implements BotAPI {
     public String makeBestMove() {
 
         String command = "";
+
+        //If first word and the bot hasn't placed a word twice in a row, place a two character word
         if (noPlacementCount >= 2 && firstWord) {
             placeFlag = true;
             return getAnyWord();
         }
+
+        //Otherwise, find the highest value first word
         command = PlaceFirstWord();
 
+        //If word is not found and the first word hasn't been placed, resst firstMove variable
         if (firstWord && command == "")
             firstMove = true;
         else firstWord = false;
 
+        //If not the first move, place the highest value word
         if (command == "")
             command = placeValTile();
         else {
@@ -360,9 +385,11 @@ public class Bot0 implements BotAPI {
             return command;
         }
 
+        //If word could not be placed, exchange
         if (command == "" && exchangeFlag == true && noPlacementCount < 2) {
             noPlacementCount++;
             command = exchange();
+
         }
 
 //        }else{
@@ -377,6 +404,8 @@ public class Bot0 implements BotAPI {
 //            placeFlag = true;
 //            return command;
 //        }
+        if(command != "")
+            exchangeCounter++;
         return command;
     }
 
@@ -389,7 +418,7 @@ public class Bot0 implements BotAPI {
 
     private String exchange() {
 
-
+        //Exchange random amoutn of letters from 1-5
         String letters = "";
         String stringRack = frameToString();
 
@@ -417,7 +446,7 @@ public class Bot0 implements BotAPI {
         else return false;
     }
 
-    public boolean isConnectingHorizontal(int i, int j) {
+    public boolean isConnectingHorizontal(int i, int j) { //Checks to see if a letter is adjacent to another letter horizontally
         if (board.getSquareCopy(i + 1, j).isOccupied() ||
                 board.getSquareCopy(i - 1, j).isOccupied() ||
                 board.getSquareCopy(i, j + 1).isOccupied()
@@ -425,7 +454,7 @@ public class Bot0 implements BotAPI {
         else return false;
     }
 
-    public boolean isConnectingVertical(int i, int j) {
+    public boolean isConnectingVertical(int i, int j) {//Checks to see if a letter is adjacent to another letter vertically
         if (board.getSquareCopy(i + 1, j).isOccupied() ||
                 board.getSquareCopy(i, j - 1).isOccupied() ||
                 board.getSquareCopy(i, j + 1).isOccupied()
@@ -445,7 +474,7 @@ public class Bot0 implements BotAPI {
     }
 
 
-    private String highestWord(int length)
+    private String highestWord(int length) //Functionality not implemented yet
     {
         String user_frame = me.getFrameAsString();
 
@@ -482,7 +511,7 @@ public class Bot0 implements BotAPI {
 
 
 
-
+//Functionality not implemented yet
     private String getHighestWord(int row, int col) {
         char highValSquare = board.getSquareCopy(row, col).getTile().getLetter(); // The high value tile from board
 
@@ -506,6 +535,7 @@ public class Bot0 implements BotAPI {
     }
 
 
+
     public String frameToString() {
         String user_frame = me.getFrameAsString();
         String frameToString = "";
@@ -520,7 +550,7 @@ public class Bot0 implements BotAPI {
         return frameToString.toUpperCase();
     }
 
-
+    //Gets all valid permutations of words from a player's frame that exist in the dictionary
     private ArrayList<String> getPermutation(String word, String perm, ArrayList<String> words) {
 
         // If string is empty
@@ -551,6 +581,7 @@ public class Bot0 implements BotAPI {
         return new Word(0, 0, true, str);
     }
 
+    //Find the highest value tile on the board and see if th ebot can place a word including that tile
     public String placeValTile() {
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
@@ -683,6 +714,7 @@ public class Bot0 implements BotAPI {
         return "";
     }
 
+    //Functionality not implemented yet
     public String checkValuableSquare() {
         //Check for empty triple word scores
         for (int i = 0; i < 15; i++) {
@@ -750,6 +782,8 @@ public class Bot0 implements BotAPI {
         }
         return "";
     }
+
+    //Checks to see if the bot can place a word in a specific position on the hboard
     private String isValidMove(String word, int col, int row) {
         //Find index of string where the tile from the board is located in the word
         char valTile = board.getSquareCopy(row, col).getTile().getLetter();
@@ -775,7 +809,7 @@ public class Bot0 implements BotAPI {
             return "";
     }
 
-
+    //Gets the highest word from the permutations array
     private String getHighWordScore() //Returns highest scoring word
     {
 
@@ -798,6 +832,8 @@ public class Bot0 implements BotAPI {
         return tempWord;
     }
 
+
+    //Helper function that popoulates the word score arraylist
     public void populateWordScore()
     {
         //Populate word_score array with corresponding scores
@@ -814,7 +850,7 @@ public class Bot0 implements BotAPI {
     }
 
 
-
+    //Returns number of balnks in a wiord
     private int getNumBlanks(String word)
     {
         int count = 0;
@@ -827,16 +863,13 @@ public class Bot0 implements BotAPI {
     }
 
 
-//    private ArrayList<String> getValidPermuations()
-//    {
-//
-//    }
 
+    //removes the lowest value letter from the word, (bot will then try to compute a word without the letter)
     private String removeLowestLetter(String word)
     {
         if(word.length() == 0)
         {
-            exchangeFlag = true;
+            exchangeFlag = true; //If no word, exchange
         }
         int min = 11;
         int minIndex = 0;
@@ -851,7 +884,7 @@ public class Bot0 implements BotAPI {
             }
         }
         String newWord = "";
-        for(int i = 0; i < word.length(); i++)
+        for(int i = 0; i < word.length(); i++) //Create newword without min character
         {
             if(minChar != "")
             {
@@ -893,6 +926,8 @@ public class Bot0 implements BotAPI {
         }
         return newWord;
     }
+
+    //Placing best word
     private String placeWord(String frame,  int numBlanks)
     {
         words = getPermutation(frame,"",words); //Global word array - get all permutations for the letters in the frame
@@ -933,10 +968,11 @@ public class Bot0 implements BotAPI {
         }
 
 
-        System.out.println(command);
+       // System.out.println(command);
         resetArrayLists();
         return command;
     }
+
 
     private void resetArrayLists()
     {
@@ -949,7 +985,6 @@ public class Bot0 implements BotAPI {
     private String findValidPlacement(int row, int col, String word, int tileIndex)
     {
 
-
         //Create frame with bot's frame (for converting String to Word)
         Frame frameObj = new Frame();
         ArrayList<Tile> tileArray = new ArrayList<>();
@@ -960,12 +995,14 @@ public class Bot0 implements BotAPI {
         String sRow = "";
 
 //        //Try horizontal
-        int horCol = col - tileIndex; //Get the starting col index (the colum left of tile index)
+        int horCol = col - tileIndex; //Get the starting col index (the column left of tile index)
         Word horWord = new Word(row-1,  horCol-1, true, word, "B");
 
 
         if (board.isLegalPlay(frameObj, horWord)) {
             sRow = getLetterRow(horCol);
+            //
+            // System.out.println("SRow is " + sRow);
             return sRow + row + " A " + horWord.getLetters();
         }
 
@@ -977,7 +1014,7 @@ public class Bot0 implements BotAPI {
 
         if (board.isLegalPlay(frameObj, verWord)) {
             sRow = getLetterRow(verCol);
-
+           // System.out.println("SRow is " + sRow);
             return sRow + verRow +  " D " + horWord.getLetters();
         }
 
@@ -1014,6 +1051,7 @@ public class Bot0 implements BotAPI {
         }
     }
 
+    //Replaces the string with to include blanks from the frame
     private String ReplaceBlank(String placement, char designation, int numBlanks)
     {
         String newPlacement = "";
@@ -1037,6 +1075,8 @@ public class Bot0 implements BotAPI {
         return newPlacement;
     }
 
+
+    //checks to see if the designated character is already on the board (we use 'B' for the designated character when its not the first move)
     private void onBoardCheck(Word word )
     {
         int row = word.getRow();
