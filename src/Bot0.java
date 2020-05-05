@@ -9,11 +9,6 @@ public class Bot0 implements BotAPI {
     // Bot may not alter the state of the game objects
     // It may only inspect the state of the board and the player objects
 
-    //the i wanna be really smart array
-    int[] commonLetters = {2,11,10,11,1,11,11,11,4,11,11,9,11,7,5,11,//p
-            11,3,8,6,11,11,11,11,11,11};
-    String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     private PlayerAPI me;
     private OpponentAPI opponent;
     private BoardAPI board;
@@ -32,6 +27,10 @@ public class Bot0 implements BotAPI {
     private ArrayList<String> words = new ArrayList<>(); //Stores all the permutations
 
     private boolean exchangeFlag = false;
+    //the i wanna be really smart array
+    int[] commonLetters = {2,11,10,11,1,11,11,11,4,11,11,9,11,7,5,11,//p
+            11,3,8,6,11,11,11,11,11,11};
+    String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     Bot0(PlayerAPI me, OpponentAPI opponent, BoardAPI board, UserInterfaceAPI ui, DictionaryAPI dictionary) {
         this.me = me;
@@ -50,131 +49,6 @@ public class Bot0 implements BotAPI {
     //6. Place word.
     //7. If word cannot be placed, pass
 
-
-    public String PlaceFirstWord() {
-            System.out.println(frameToString());
-            String frame = "";
-            if (/*board.isFirstPlay() */ firstMove) {
-                //Put tiles from frame into a word
-                frame = frameToString();
-                //frame = frame.substring(1);
-                firstMove = false;
-            }
-
-            int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
-
-            if(numBlanks > 0) //Remove blank tiles
-                frame = frame.replaceAll("_", "A");
-
-            return placeWord(frame,numBlanks);
-
-
-
-
-    }
-    public String placeWordValTile(String coordinates)
-    {
-
-        if(firstMove)  //Skip when it's the first move
-            return "";
-
-        //Get coordinates (row and column) and store in integers
-
-//        if(coordinates == "")
-//        {
-//            return "";
-//        }
-        String[] coordsArr = coordinates.split(" ");
-        String colStr = coordsArr[1];
-        String rowStr = coordsArr[0];
-        int col = Integer.parseInt(colStr);
-        int row = Integer.parseInt(rowStr);
-
-
-        //Combine the frame and the high val tile to a string and find permutations
-        String valTile = String.valueOf(board.getSquareCopy(row-1,col-1).getTile().getLetter());
-        String frame = frameToString();
-
-        String word = frame + valTile;
-
-        int numBlanks = getNumBlanks(word);
-        if(numBlanks > 0) //Remove blank tiles
-            word = word.replaceAll("_", "B");
-
-        //get word permutations and score
-        words = getPermutation(word,"",words);
-        String tempWord = word;
-        while(words.size() == 0 && tempWord.length() > 0)
-        {
-            words = getPermutation(tempWord,"",words);
-            tempWord = removeLowestLetter(tempWord,valTile.charAt(0));
-        }
-
-
-        if(words.size() == 0) return "";
-
-        int highValIndex = 0;
-        String placement = "";
-        for(int i = 0; i < words.size(); i++)
-        {
-            String tryWord = words.get(i);  //ith valid word
-            for(int j = 0; j < tryWord.length(); j++)
-            {
-                String currChar = String.valueOf(tryWord.charAt(j));
-                if(currChar.equals(valTile))
-                {
-                    highValIndex = j;
-                    break;
-                }
-            }
-            try {
-                placement = findValidPlacement(row, col, tryWord, highValIndex); //Get a valid word placement
-            }catch(IndexOutOfBoundsException e){}
-            if(placement != "")
-                break;          //If there was no valid word placement, check next word
-        }
-
-
-        if(numBlanks > 0) //Add the blanks back
-        {
-            if(placement.length() > 1) {
-                placement = ReplaceBlank(placement, 'B', numBlanks);
-                //placement.replaceAll("B","_");
-                System.out.println(placement + " <---");
-                placement += " ";
-            }
-        }
-
-
-        if(numBlanks >0 && placement.length() > 1)
-        for (int i = 0; i < placement.length(); i++)
-        {
-            if (placement.charAt(i) == Tile.BLANK){
-                placement += "B";
-               // break;
-            }
-        }
-
-
-        resetArrayLists();
-        return placement;
-    }
-
-
-    private String placeWordValSquare(String coordinates)
-    {
-        //Store coordinates in row and col arrays;
-        String[] coordsArr = coordinates.split(" ");
-        String colStr = coordsArr[1];
-        String rowStr = coordsArr[0];
-        int col = Integer.parseInt(colStr);
-        int row = Integer.parseInt(rowStr);
-
-
-        return "";
-    }
-
-    //Functions
     //1. Place Best Word
     public String getCommand() {
         // Add your code here to input your commands
@@ -217,54 +91,6 @@ public class Bot0 implements BotAPI {
         return command;
     }
 
-
-    public String makeBestMove() {
-
-        String command = "";
-        if (noPlacementCount >= 2 && firstWord) {
-            placeFlag = true;
-            return getAnyWord();
-        }
-        command = PlaceFirstWord();
-
-        if (firstWord && command == "")
-            firstMove = true;
-        else firstWord = false;
-
-        if (command == "")
-            command = placeValTile();
-        else {
-            placeFlag = true;
-            return command;
-        }
-
-        if (command == "" && exchangeFlag == true && noPlacementCount < 2) {
-            noPlacementCount++;
-            command = exchange();
-        }
-
-//        }else{
-//            placeFlag = true;
-//            return command;
-//        }
-
-
-//        if (command == "" && turnCount % 4 == 0){
-//
-//        }else{
-//            placeFlag = true;
-//            return command;
-//        }
-        return command;
-    }
-    private boolean isVowel(String c) {
-
-        if (c.equals("A") || c.equals("E") || c.equals("I") || c.equals("O") || c.equals("U")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
     private String getAnyWord() { //Worst case, try and make a valid word placement
         System.out.println("Miko is the big gay lel");
         String frame = "";
@@ -329,7 +155,232 @@ public class Bot0 implements BotAPI {
         placeFlag = false;
         return "PASS";
     }
-        private boolean isChallenge(){
+    public String PlaceFirstWord() {
+        System.out.println(frameToString());
+        String frame = "";
+        if (/*board.isFirstPlay() */ firstMove) {
+            //Put tiles from frame into a word
+            frame = frameToString();
+            //frame = frame.substring(1);
+            firstMove = false;
+        }
+
+        int numBlanks = getNumBlanks(frame); //find number of blank tiles in the frame
+
+        if(numBlanks > 0) //Remove blank tiles
+            frame = frame.replaceAll("_", "A");
+
+        return placeWord(frame,numBlanks);
+
+
+
+
+    }
+    public String placeWordValTile(String coordinates)
+    {
+        if(firstMove)  //Skip when it's the first move
+            return "";
+        //Get coordinates (row and column) and store in integers
+
+//        if(coordinates == "")
+//        {
+//            return "";
+//        }
+        String[] coordsArr = coordinates.split(" ");
+        String colStr = coordsArr[1];
+        String rowStr = coordsArr[0];
+        int col = Integer.parseInt(colStr);
+        int row = Integer.parseInt(rowStr);
+
+        //Combine the frame and the high val tile to a string and find permutations
+        String valTile = String.valueOf(board.getSquareCopy(row-1,col-1).getTile().getLetter());
+        String frame = frameToString();
+
+        String word = frame + valTile;
+
+        int numBlanks = getNumBlanks(word);
+        if(numBlanks > 0) //Remove blank tiles
+            word = word.replaceAll("_", "B");
+
+        //get word permutations and score
+        words = getPermutation(word,"",words);
+        String tempWord = word;
+        while(words.size() == 0 && tempWord.length() > 0)
+        {
+            words = getPermutation(tempWord,"",words);
+            tempWord = removeLowestLetter(tempWord,valTile.charAt(0));
+        }
+
+
+        if(words.size() == 0) return "";
+
+        int highValIndex = 0;
+        String placement = "";
+        for(int i = 0; i < words.size(); i++)
+        {
+            String tryWord = words.get(i);  //ith valid word
+            for(int j = 0; j < tryWord.length(); j++)
+            {
+                String currChar = String.valueOf(tryWord.charAt(j));
+                if(currChar.equals(valTile))
+                {
+                    highValIndex = j;
+                    break;
+                }
+            }
+            try {
+                placement = findValidPlacement(row, col, tryWord, highValIndex); //Get a valid word placement
+            }catch(IndexOutOfBoundsException e){}
+            if(placement != "")
+                break;          //If there was no valid word placement, check next word
+        }
+
+
+        if(numBlanks > 0) //Add the blanks back
+        {
+            if(placement.length() > 1) {
+                placement = ReplaceBlank(placement, 'B', numBlanks);
+                //placement.replaceAll("B","_");
+                System.out.println(placement + " <---");
+                placement += " ";
+            }
+        }
+
+
+        if(numBlanks >0 && placement.length() > 1)
+            for (int i = 0; i < placement.length(); i++)
+            {
+                if (placement.charAt(i) == Tile.BLANK){
+                    placement += "B";
+                    break;
+                }
+            }
+
+
+        resetArrayLists();
+        return placement;
+    }
+
+
+    private String placeWordValSquare(String coordinates)
+    {
+        //Store coordinates in row and col arrays;
+        String[] coordsArr = coordinates.split(" ");
+        String colStr = coordsArr[1];
+        String rowStr = coordsArr[0];
+
+        int col = Integer.parseInt(colStr);
+        int row = Integer.parseInt(rowStr);
+
+
+
+
+
+
+        return "";
+    }
+
+    private String getLongestWord(int i, int j)
+    {
+        boolean isHorizontal = true;
+        int row = i;
+        int col = j;
+        int max_length = 7;
+        int curr_length = 0;
+        ArrayList<Integer> longest = new ArrayList<>();
+
+        //Check if the longest word is horizontal with the first letter beginning on the square
+        while( !board.getSquareCopy(row,col).isOccupied() && col <15 && curr_length != 7)
+        {
+            col++;
+            curr_length++;
+        }
+        if(curr_length == 7 && isConnectingHorizontal(row,col)) //Found longest possible word
+        {
+
+        }
+        else
+        {
+            longest.add(curr_length);
+            curr_length = 0;
+            col = j;
+        }
+
+        //Check if the longest word is vertical with the first letter beginning on the square
+        while( !board.getSquareCopy(row,col).isOccupied() && row <15 && curr_length != 7 )
+        {
+            row++;
+            curr_length++;
+        }
+        if(curr_length == 7 && isConnectingVertical(row,col)) //Found longest possible word
+        {
+
+        }
+        else
+        {
+            longest.add(curr_length);
+            curr_length =0;
+            row = i;
+        }
+
+        //Find max
+        int temp = longest.get(i);
+        int highestIndex =0;
+        for(int index = 1; index<longest.size(); index++)
+        {
+            if(longest.get(index) > temp)
+            {
+                temp = longest.get(index);
+                highestIndex = index;
+            }
+        }
+        String word = highestWord(longest.get(highestIndex));
+
+        return "";
+    }
+
+
+    public String makeBestMove() {
+
+        String command = "";
+        if (noPlacementCount >= 2 && firstWord) {
+            placeFlag = true;
+            return getAnyWord();
+        }
+        command = PlaceFirstWord();
+
+        if (firstWord && command == "")
+            firstMove = true;
+        else firstWord = false;
+
+        if (command == "")
+            command = placeValTile();
+        else {
+            placeFlag = true;
+            return command;
+        }
+
+        if (command == "" && exchangeFlag == true && noPlacementCount < 2) {
+            noPlacementCount++;
+            command = exchange();
+        }
+
+//        }else{
+//            placeFlag = true;
+//            return command;
+//        }
+
+
+//        if (command == "" && turnCount % 4 == 0){
+//
+//        }else{
+//            placeFlag = true;
+//            return command;
+//        }
+        return command;
+    }
+
+    private boolean isChallenge(){
         if (turnCount % 4 == 0) {
             return true;
         }
@@ -428,64 +479,6 @@ public class Bot0 implements BotAPI {
 
 
 
-    private String getLongestWord(int i, int j)
-    {
-        boolean isHorizontal = true;
-        int row = i;
-        int col = j;
-        int max_length = 7;
-        int curr_length = 0;
-        ArrayList<Integer> longest = new ArrayList<>();
-
-        //Check if the longest word is horizontal with the first letter beginning on the square
-        while( !board.getSquareCopy(row,col).isOccupied() && col <15 && curr_length != 7)
-        {
-            col++;
-            curr_length++;
-        }
-        if(curr_length == 7 && isConnectingHorizontal(row,col)) //Found longest possible word
-        {
-
-        }
-        else
-        {
-            longest.add(curr_length);
-            curr_length = 0;
-            col = j;
-        }
-
-        //Check if the longest word is vertical with the first letter beginning on the square
-        while( !board.getSquareCopy(row,col).isOccupied() && row <15 && curr_length != 7 )
-        {
-            row++;
-            curr_length++;
-        }
-        if(curr_length == 7 && isConnectingVertical(row,col)) //Found longest possible word
-        {
-
-        }
-        else
-        {
-            longest.add(curr_length);
-            curr_length =0;
-            row = i;
-        }
-
-        //Find max
-        int temp = longest.get(i);
-        int highestIndex =0;
-        for(int index = 1; index<longest.size(); index++)
-        {
-            if(longest.get(index) > temp)
-            {
-                temp = longest.get(index);
-                highestIndex = index;
-            }
-        }
-        String word = highestWord(longest.get(highestIndex));
-
-        return "";
-    }
 
 
 
@@ -513,8 +506,7 @@ public class Bot0 implements BotAPI {
     }
 
 
-    public String frameToString()
-    {
+    public String frameToString() {
         String user_frame = me.getFrameAsString();
         String frameToString = "";
         for (int i = 0; i < user_frame.length(); i++) {
@@ -529,8 +521,7 @@ public class Bot0 implements BotAPI {
     }
 
 
-    private ArrayList<String> getPermutation(String word, String perm, ArrayList<String> words)
-    {
+    private ArrayList<String> getPermutation(String word, String perm, ArrayList<String> words) {
 
         // If string is empty
         if (word.length() == 0) {
@@ -560,9 +551,7 @@ public class Bot0 implements BotAPI {
         return new Word(0, 0, true, str);
     }
 
-    public String placeValTile()
-    {
-
+    public String placeValTile() {
         //check for tiles with value 10
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -659,7 +648,6 @@ public class Bot0 implements BotAPI {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if(board.getSquareCopy(i,j).isOccupied())
-
                     if (board.getSquareCopy(i, j).getTile().getValue() == 2) {
                         String coordinates = "";
                         coordinates += i+1;
@@ -695,10 +683,7 @@ public class Bot0 implements BotAPI {
         return "";
     }
 
-
     public String checkValuableSquare() {
-
-
         //Check for empty triple word scores
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -765,8 +750,7 @@ public class Bot0 implements BotAPI {
         }
         return "";
     }
-    private String isValidMove(String word, int col, int row)
-    {
+    private String isValidMove(String word, int col, int row) {
         //Find index of string where the tile from the board is located in the word
         char valTile = board.getSquareCopy(row, col).getTile().getLetter();
 
@@ -932,7 +916,6 @@ public class Bot0 implements BotAPI {
         if(numBlanks > 0) //Add the blanks back
         {
             word = ReplaceBlank(word, 'A', numBlanks);
-
         }
         String command = "";
         if (frame != "") {
@@ -1048,42 +1031,29 @@ public class Bot0 implements BotAPI {
                     onBoardCounter--;
                 }
                 else
-                newPlacement += '_';
+                    newPlacement += '_';
             }
         }
         return newPlacement;
     }
 
-    private void onBoardCheck(Word word ) {
+    private void onBoardCheck(Word word )
+    {
         int row = word.getRow();
         int col = word.getColumn();
 
-        for (int i = 0; i < word.getLetters().length(); i++) {
-            if (word.getLetters().charAt(i) == 'B' && word.isHorizontal())
-                if (board.getSquareCopy(row, col).isOccupied() && board.getSquareCopy(row + i, col).getTile().getLetter() == 'B') {
+        for(int i = 0; i < word.getLetters().length(); i++)
+        {
+            if(word.getLetters().charAt(i) == 'B' && word.isHorizontal())
+                if(board.getSquareCopy(row,col).isOccupied() && board.getSquareCopy(row + i, col).getTile().getLetter() == 'B')
+                {
                     onBoardCounter++;
-                } else if (word.getLetters().charAt(i) == 'B' && !word.isHorizontal())
-                    if (board.getSquareCopy(row, col).isOccupied() && board.getSquareCopy(row, col + i).getTile().getLetter() == 'B') {
+                }
+                else if(word.getLetters().charAt(i) == 'B' && !word.isHorizontal())
+                    if(board.getSquareCopy(row,col).isOccupied() && board.getSquareCopy(row, col+i).getTile().getLetter() == 'B')
+                    {
                         onBoardCounter++;
                     }
         }
     }
-
-        private int getCommonVal(char letter)
-        {
-
-            int index = 0;
-            for(int i=0; i < alphabet.length(); i++)
-            {
-                if(letter == alphabet.charAt(i))
-                {
-                    index = i;
-                    break;
-                }
-            }
-
-            return commonLetters[index];
-        }
-    }
-
-
+}
